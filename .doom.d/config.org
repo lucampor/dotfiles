@@ -1,0 +1,1382 @@
+#+title: Literate Config
+#+startup: fold
+* Basic things
+:PROPERTIES:
+:header-args: :tangle ~/.doom.d/config.el
+:END:
+#+begin_src elisp
+(setq user-full-name "Luis Camacho"
+      user-mail-address "camacho.luis@protonmail.com")
+#+end_src
+
+#+RESULTS:
+: camacho.luis@protonmail.com
+
+I don't like custom.el >:(
+#+begin_src elisp
+(setq custom-file "/dev/null")
+#+end_src
+** Global Config
+#+begin_src elisp
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(setq doom-theme 'doom-tomorrow-night)
+(setq doom-big-font t)
+(setq doom-font (font-spec :family "JetBrainsMonoNL Nerd Font" :size 20 :weight 'regular)
+     doom-variable-pitch-font (font-spec :family "FiraCode Nerd Font" :size 21))
+
+(setq org-directory "~/org/")
+(setq org-noter-notes-search-path (list (concat org-directory "book-notes/")))
+(setq org-attach-id-dir (concat org-directory "attach/"))
+
+(setq display-line-numbers-type 'relative)
+#+end_src
+
+* Keybindings
+:PROPERTIES:
+:header-args: :tangle ~/.doom.d/config.el
+:END:
+#+begin_src elisp
+(map! :leader
+      :desc "Calfw calendar" "oC" #'lcp/open-calendar
+      (:prefix-map ("r" . "org-roam")
+        :desc "Find nodes" "f" #'org-roam-node-find
+        :desc "Insert node" "i" #'org-roam-node-insert
+        :desc "UI" "U" #'org-roam-ui-mode)
+      (:prefix-map ("A" . "miscellaneous")
+        :desc "Cloze region" "c" #'anki-editor-cloze-region
+        )
+      (:prefix-map ("+" . "batch edit")
+        :desc "iedit-mode" "i" #'iedit-mode
+        :desc "vr/replace" "r" #'vr/replace
+        :desc "vr/mc-mark" "c" #'vr/mc-mark
+        :desc "query replace" "q" #'query-replace))
+#+end_src
+
+* UI
+:PROPERTIES:
+:header-args: :tangle ~/.doom.d/config.el
+:END:
+#+begin_src elisp
+(set-frame-parameter nil 'alpha-background 100) ; For current frame
+(add-to-list 'default-frame-alist '(alpha . 100)) ; For all new frames henceforth
+(defun kb/toggle-window-transparency ()
+  "Toggle transparency."
+  (interactive)
+  (let ((alpha-transparency 75))
+    (pcase (frame-parameter nil 'alpha-background)
+      (alpha-transparency (set-frame-parameter nil 'alpha-background 100))
+      (t (set-frame-parameter nil 'alpha-background alpha-transparency)))))
+
+#+end_src
+** Prettify symbols
+Since I use this mainly to embellish my org-roam notes, I decided to add ~prettify-symbols-mode~ just for org-mode
+#+begin_src elisp
+(setq prettify-symbols-alist
+      '(
+       ("->" . →)
+        ))
+#+end_src
+Later, if I see I could use it in more places, I'll make it so that the list changes depending on the extension
+* org-mode
+:PROPERTIES:
+:header-args: :tangle ~/.doom.d/config.el
+:END:
+#+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! org-drill)
+(package! org-ref)
+(package! org-roam-ui)
+(package! org-transclusion)
+(package! org-fragtog
+  :recipe (:host github :repo "io12/org-fragtog"))
+(package! org-roam-bibtex)
+(package! org-download)
+(package! org-super-agenda)
+#+end_src
+** Basic Config
+#+begin_src elisp
+(after! org-mode
+  (setq org-hide-emphasis-markers nil))
+
+
+
+(custom-set-variables
+    '(org-babel-load-languages
+      '((R . t)
+        (emacs-lisp . t)
+        (plantuml . t)))
+    '(org-confirm-babel-evaluate nil))
+(org-babel-do-load-languages
+        'org-babel-load-languages
+        '((R . t)
+          (emacs-lisp . t)
+          (plantuml . t)))
+#+end_src
+#+begin_src elisp
+(setq org-bullets-face-name (quote org-bullet-face))
+(setq org-bullets-bullet-list '("◎" "◉" "☉" "◌" "◦" "∙")) ;; ◍" "⊛" )
+(setq org-babel-hide-markers-mode t)
+(font-lock-add-keywords
+ 'org-mode
+    '(("^ *\\([-]\\) "
+       (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))
+      ("^ *\\([+]\\) "
+       (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "↳"))))
+      ))
+#+end_src
+** org-journal
+#+begin_src elisp
+(setq calendar-week-start-day 1) ; Begin week on Monday
+(setq calendar-date-style 'iso) ;american/european/is
+#+end_src
+#+begin_src elisp
+(defun org-journal-file-header-func (time)
+  "Custom function to create journal header."
+  (concat
+    (pcase org-journal-file-type
+      (`daily "#+TITLE: Daily Journal\n#+STARTUP: showeverything")
+      (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
+      (`monthly "#+TITLE: %B %Y Monthly Journal\n#+STARTUP: folded")
+      (`yearly "#+TITLE: %Y Yearly Journal\n#+STARTUP: folded"))))
+
+(use-package! org-journal
+  :init
+  (setq org-journal-prefix-key "C-c n j")
+  :custom
+  (org-journal-dir (concat org-directory "journal/"))
+  (org-journal-date-prefix "* ")
+  (org-journal-date-format "%A, %d %B %Y")
+  (org-journal-file-format "%Y-%m.org")
+  (org-journal-carryover-items "")
+  (org-journal-enable-agenda-integration t)
+  (org-journal-file-type 'monthly)
+  (org-journal-file-header "#+TITLE: %B %Y Monthly Journal\n#+STARTUP: folded")) ;'org-journal-file-header-func))
+(setq diary-file (concat org-journal-dir "diary.org"))
+#+end_src
+
+#+begin_src elisp
+;; (defun jethro/tag-new-node-as-draft ()
+;;   (org-roam-tag-add '("__draft__")))
+;; (add-hook 'org-roam-capture-new-node-hook #'jethro/tag-new-node-as-draft)
+#+end_src
+
+** org-screenshot
+#+begin_src elisp
+#+end_src
+
+** org-roam
+#+begin_src elisp
+(use-package! org-roam
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-completion-everywhere t)
+  (completion-ignore-case t)
+  (org-roam-directory (concat org-directory "roam/"))
+  (org-roam-dailies-directory (concat org-directory "dailies/"))
+#+end_src
+Sorted in term of /permanence/:
+- zettelkasten :: Those notes that have gone through the whole process.
+- thought :: Giving shape to thinks I'm thinking about, joining other info from other notes. It is the previous step to *zettelkasten*
+- lecture :: For the lack of a better name. Here I store notes giving shape to information extracted from *references* and *fleeting*
+- reference :: Notes related to books, websites, articles, conferences... Notice the _lack of a capture template_; this folder is just for the notes created from a BiBTex entry.
+- fleeting :: The most /temporal/ notes. This only serves the purpose of being a slip-box that contains random information extracted from miscellaneous sources
+- note :: Also /temporal/ this subdirectory works as a compendium of each note I take from a *reference* entry that is long enough to deserve its own place in my note collection
+#+begin_src elisp
+  (org-roam-capture-templates
+    '(
+      ("z" "zettelkasten" plain "%?" :target
+      (file+head "zettelkasten/${slug}.org" "#+title: ${title}\n#+filetags: :__draft__:\n")
+      :jump-to-capture t
+      :unnarrowed t)
+      ("t" "thought" plain "%?" :target
+      (file+head "thought/${slug}.org" "#+title: ${title}\n#+filetags: :__draft__:\n")
+      :jump-to-capture t
+      :unnarrowed t)
+      ("l" "lecture" plain "%?" :target
+      (file+head "lecture/${slug}.org" "#+title: ${title}\n#+filetags: :__draft__:\n")
+      :jump-to-capture t
+      :unnarrowed t)
+      ("f" "fleeting" plain "%?" :target
+      (file+head "fleeting/%<%Y%m%d>-${slug}.org" "#+title: ${title}\n#+filetags: :__draft__:\n")
+      :jump-to-capture t
+      :unnarrowed t)
+      ("n" "note" plain "%?" :target
+      (file+head "note/%<%Y%m%d>-${slug}.org" "#+title: ${title}\n#+filetags: :__draft__:\n")
+      :jump-to-capture t
+      :unnarrowed t)
+      ))
+  (org-roam-node-display-template
+        (concat "${type:15} ${title:*} " (propertize "${tags:100}" 'face 'org-tag)))
+  (org-roam-dailies-capture-templates
+   '(("d" "default" entry "* [ ] %?\n<%<%Y-%m-%d>>" :target
+      (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n#+filetags: :daily:\n"))))
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ("C-c n g" . org-roam-graph)
+         :map org-mode-map
+         ("C-M-i"    . completion-at-point))
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map)
+  :config
+  (org-roam-setup)
+  (org-roam-db-autosync-mode)
+  (require 'org-roam-dailies)
+  )
+#+end_src
+
+#+begin_src elisp
+(cl-defmethod org-roam-node-type ((node org-roam-node))
+  "Return the TYPE of NODE."
+  (condition-case nil
+      (file-name-nondirectory
+       (directory-file-name
+        (file-name-directory
+         (file-relative-name (org-roam-node-file node) org-roam-directory))))
+    (error "")))
+#+end_src
+
+This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e1713][source]]) is really useful to exclude the nodes with the ":drill:" tag necessary for org-drill to work.
+#+begin_src elisp
+;; Exclude `org-drill' items from `org-roam'.
+(require 'org-drill)
+(setq org-roam-db-node-include-function
+      (defun dotfiles/org-roam-include ()
+        (and (not (member org-drill-question-tag (org-get-tags))))))
+
+;; Don't forget to run the following commands!
+;; M-x org-roam-db-clear-all
+;; M-x org-roam-db-sync
+#+end_src
+;; M-x org-roam-db-sync
+** org-todo
+#+begin_src elisp
+(setq org-ellipsis " ⮷") ; ⚻ ☡ ⚕ ♅ ⚶
+(setq org-todo-keywords
+    '((sequence "TODO(t)" "WAIT(W)" "NEXT(N)" "CHECK" "|" "DONE(D)" "CANCELED(C)")
+      (sequence "HOMEWORK(h)" "EXAM(e)" "LAB(b)" "TASK" "DELIVERY(d)" "MEETING(M)" "|" "FINISHED(F)")
+      (sequence "[ ]" "[-]" "[?]" "|" "[V]" "[X]")
+      (sequence "IDEA(i)" "MAYBE(y)" "SOMEDAY(m)" "PROJECT(r)" "GOAL(g)" "LEARN(l)" "|" "DONE" "DROPPED(P)") ; Stuck projects
+      (sequence "CHORE(R)" "PLAN(p)" "TRIP(T)" "EVENT(E)" "|" "DONE" "MISSED(S)")))
+
+(setq org-todo-keyword-faces
+    '(("TODO" . (:foreground "#7CFC00" :weight bold)) ;
+      ("WAIT" . (:foreground "#FDFF1F" :weight bold))
+      ("NEXT" . (:foreground "#EE7621" :weight bold))
+      ("CHECK" . (:foreground "aquamarine" :weight bold))
+      ("DONE" . (:foreground "#1E90FF" :weight bold))
+      ("CANCELED" . (:foreground "#FF3030" :weight bold))
+
+      ("HOMEWORK" . (:foreground "DarkSlateGray1" :weight bold))
+      ("EXAM" . (:foreground "#EE7942" :weight bold))
+      ("LAB" . (:foreground "thistle" :weight bold))
+      ("TASK" . (:foreground "maroon" :weight bold))
+      ("DELIVERY" . (:foreground "#FFF68F" :weight bold))
+      ("MEETING" . (:foreground "#EED5D2" :weight bold))
+      ("FINISHED" . (:foreground "#1E90FF" :weight bold))
+
+      ("IDEA" . (:foreground "DeepSkyBlue1" :weight bold))
+      ("MAYBE" . (:foreground "#610E5D" :weight bold))
+      ("DAILY" . (:foreground "#FF7F24" :weight bold))
+      ("SOMEDAY" . (:foreground "#EED5D2" :weight bold))
+      ("PROJECT" . (:foreground "#4EEE94" :weight bold))
+      ("GOAL". (:foregoround "#FF3E96" :weight bold))
+      ("LEARN" . (:foreground "#8EE5EE" :weight bold))
+      ("DROPPED" . (:foreground "#FF3030" :weight bold))
+
+      ("[ ]" . (:foreground "SteelBlue" :weight bold))
+      ("[-]" . (:foreground "#EEC591" :weight bold))
+      ("[?]" . (:foreground "#C71585" :weight bold))
+      ("[V]" . (:foreground "LimeGreen" :weight bold))
+      ("[X]" . (:foreground "IndianRed" :weight bold))
+
+      ("CHORE" . (:foreground "chocolate" :weight bold))
+      ("PLAN" . (:foreground "deep pink" :weight bold))
+      ("TRIP" . (:foreground "LightSteelBlue2" :weight bold))
+      ("EVENT" . (:foreground "#B3EE3A" :weight bold))
+      ("MISSED" . (:foreground "#FF3030" :weight bold))
+      ))
+#+end_src
+
+#+begin_src elisp
+(setq org-priority-lowest 70)
+(setq org-priority-default 68)
+(setq org-priority-faces '((65 . "red")
+                          (66 . "gold")
+                          (67 . "lime green")
+                          (68 . "dark turquoise")
+                          (69 . "light sky blue")
+                          (70 . "plum2")
+                          ))
+#+end_src
+** org-tags
+#+begin_src elisp
+(setq org-tags-exclude-from-inheritance '("main" "drill"
+                                          "__book__" "__index__" "__subject__" "__media__" "__conference__" ;; Tags used in org-roam
+                                          ))
+#+end_src
+
+*** [[https://www.gnu.org/software/emacs/manual/html_node/org/Tag-Hierarchy.html][Tag Hierarchy]]
+#+begin_src
+(setq org-tag-alist '(
+                      ;; Related to University
+                      (:startgrouptag . nil)
+                      ("@uni" . ?u)
+                        (:grouptags . nil)
+                        ("talf")("software")("business")("computer")
+                        ;("os")("software")("db")("ai")("diffcalc")
+                        (:grouptags . nil)
+                        ("study")("bureaucracy")
+                      (:endgrouptag . nil)
+                      ;; Miscellaneous
+                      (:startgrouptag . nil)
+                      ("@objective")
+                        (:grouptags . nil)
+                        ("@deutsch")("@EEUU")("project")("health")
+                      (:endgrouptag . nil)
+
+                      (:startgrouptag . nil)
+                      ("miscellaneous" . nil)
+                        (:grouptags . nil)
+                        ("buy")("programming")("recommendation")("finance")("family")("clean")("social")
+                      (:endgrouptag . nil)
+
+                      ;; Related to BEST
+                      (:startgrouptag . nil)
+                      ("@BEST" . ?b)
+                        (:grouptags . nil)
+                          ("IT")("reu")("feedback")("SC23" . ?s)("AAP" . ?a)
+                      (:endgrouptag . nil)
+                              (:startgrouptag . nil)
+                              ("SC23" . nil)
+                              (:grouptags . nil)
+                              ("logistics")("academics")("vivaldi")("core")
+                              (:endgrouptag . nil)
+                              ; AAP
+                              (:startgrouptag . nil) ;mutually exclusive (startgroup)
+                              ("AAP" . nil)
+                              (:grouptags . nil)
+                              ("1_1")("6_4")("5_2")
+                              (:endgrouptag . nil)
+                      ))
+
+#+end_src
+
+** org-agenda
+#+begin_src elisp
+(use-package! org-agenda
+  :custom
+      (org-agenda-start-on-weekday t)
+      (org-agenda-span 31)
+      (org-agenda-start-day "-3d")
+      (org-tags-exclude-from-inheritance '("main"))
+      (org-agenda-include-diary nil)
+      (org-agenda-files (list org-journal-dir org-roam-dailies-directory))
+      (org-agenda-time-grid
+        '((daily today require-timed remove-match)
+          (700 900 1100 1300 1500 1700 1900 2300)
+          " ┄┄┄┄┄" "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+      (org-agenda-prefix-format '((agenda . " %i %?t %s")
+                                (todo . " %i  ")
+                                (tags . " %i %-12:c")
+                                (search . " %i %-12:c")))
+      (org-agenda-show-future-repeats 'nil)
+      (org-agenda-skip-scheduled-if-deadline-is-shown nil);'t)
+      (org-agenda-skip-scheduled-delay-if-deadline 't)
+      (org-agenda-dim-blocked-tasks nil)
+      (org-agenda-skip-deadline-if-done 't)
+      (org-agenda-skip-scheduled-if-done 't)
+      (org-agenda-skip-timestamp-if-done 't)
+      (org-agenda-todo-list-sublevels 't)
+      (org-agenda-todo-ignore-deadlines 'far)
+      )
+(org-super-agenda-mode)
+#+end_src
+
+Now the tags appear in a better spot:
+#+begin_src elisp
+(add-hook 'org-agenda-mode-hook #'(lambda () (setq org-agenda-align-tags-to-column (- (window-text-width)))))
+#+end_src
+
+
+#+begin_src elisp
+;; IMPROVE actualmente te sobreescribe el todo que tienes puesto
+;; (defun org-summary-todo (n-done n-not-done)
+;;   "Switch entry to DONE when all subentries are done, to TODO otherwise."
+;;   (let (org-log-done org-log-states)   ; turn off logging
+;;     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+;; (add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
+#+end_src
+#+begin_src elisp
+;; (mapc
+;;  (lambda (x) (add-to-list 'org-agenda-files x))
+;;  (mapcar
+;;    (lambda (x) (concat org-journal-dir x))
+;;    '("routine.org" "projects.org")))
+
+;; (mapc
+;;  (lambda (x) (add-to-list 'org-agenda-files x))
+;;    (directory-files org-roam-dailies-directory t directory-files-no-dot-files-regexp))
+#+end_src
+
+*** [[https://orgmode.org/worg/org-tutorials/org-custom-agenda-commands.html][Custom commands]]
+#+begin_src elisp
+(setq org-agenda-custom-commands
+      '(("n" "Main agenda"
+         ((agenda "" ((org-agenda-span 31)
+                      (org-agenda-include-diary nil)
+                      ))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '((:name "Due Soon"
+                                 :deadline future
+                                 :order 8)
+                          (:name "Overdue"
+                                 :deadline past
+                                 :order 7)
+                          (:name "University"
+                                 :order 1
+                                 :tag "@uni")
+                          (:name "BEST"
+                                 :order 2
+                                 :tag "@BEST")
+                          (:name "Monthly objectives"
+                                 :order 19
+                                 :and (:tag "@objective"
+                                       :tag "@monthly"))
+                          (:name "Buying List"
+                                 :order 50
+                                 :and (:tag "buy"
+                                      :not (:and (:children todo
+                                                   :todo "[-]"))))
+                          (:name "Main Recommendations"
+                                 :order 51
+                                 :and (:tag "recommendation"
+                                       :not (:and (:children todo
+                                                   :todo "[-]"))))
+                          (:discard
+                                (:and (:tag ("@objective" "recommendation"))))
+
+                          )))))
+         nil
+         ("~/org/calendar.ics"))
+        ("o" "Objectives"
+         alltodo "" ((org-agenda-overriding-header "Objectives")
+                     (org-agenda-dim-blocked-tasks nil)
+                     (org-agenda-files (append org-agenda-files (list (concat org-directory "projects.org"))))
+                     (org-super-agenda-groups
+                      '((:name "Monthly objectives"
+                               :order 1
+                               :tag "@monthly")
+                        (:name "Main objectives"
+                               :order 2
+                               :and (:tag "@objective"
+                                     :tag "main"))
+                        (:name "Miscellaneous todos"
+                               :order 10
+                               :and (:todo ("TODO" "CHORE" "TASK")
+                                     :not (:tag ("@routine" "@objective"))))
+                        (:discard :anything)))))
+
+        ("W" "Daily Chores"
+         ((agenda "" ((org-agenda-span 1)
+                      ;(org-agenda-files (append org-agenda-files (directory-files org-roam-dailies-directory t directory-files-no-dot-files-regexp)))
+                      (org-agenda-overriding-header "")
+                      ;(org-agenda-files (directory-files org-roam-dailies-directory t directory-files-no-dot-files-regexp))
+                      (org-agenda-start-day "0d")
+                      (org-agenda-skip-timestamp-if-done nil)
+                      (org-agenda-skip-scheduled-if-done nil)
+                      (org-agenda-sorting-strategy '(time-up deadline-up scheduled-up ts-up priority-down habit-down))
+                      (org-agenda-remove-tags 't)
+                      (org-agenda-scheduled-leaders '("[Scheduled] " "Sched.%2dx: "))
+                      (org-agenda-deadline-leaders '("[Deadline] " "In %2d d.: " "%2d d. ago: "))
+
+                      (org-agenda-time-grid
+                        '((daily today require-timed remove-match)
+                          (700 900 1100 1300 1500 1700 1900 2100 2300)
+                          " ┄┄┄┄┄" "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+                      (org-agenda-show-current-time-in-grid nil)
+                      (org-super-agenda-groups
+                       '(
+                         (:name ""
+                               :time-grid t
+                               :date today
+                               :order 1)
+                         (:name "Incoming"
+                               :and (:deadline t)
+                                     ;:not (:todo ("DONE" "FINISHED" "[V]" "[X]")))
+                               :order 7)
+                         (:discard :anything)
+                      ))))
+          (alltodo "" ((org-agenda-span 21)
+                     (org-agenda-overriding-header "")
+                     (org-agenda-start-day "+0d")
+                     (org-agenda-sorting-strategy '(time-up deadline-up scheduled-up ts-up habit-down))
+                     (org-agenda-remove-tags 't)
+                     (org-agenda-block-separator nil)
+                     (org-agenda-todo-keyword-format "")
+                     (org-agenda-prefix-format '((todo . " ◎ ")))
+                     (org-super-agenda-groups
+                      '((:name "Miscellaneous todos"
+                               :order 9
+                               :and (:todo ("TODO" "CHORE" "TASK")
+                                     :not (:tag ("@routine" "@objective"))))
+                        (:name "Scheduled"
+                               :scheduled t
+                               :order 7)
+                        (:discard (:anything))
+                        ))))))
+        ))
+#+end_src
+
+#+RESULTS:
+| n | Main agenda  | ((agenda  ((org-agenda-span 31) (org-agenda-include-diary nil))) (alltodo  ((org-agenda-overriding-header ) (org-super-agenda-groups '((:name Due Soon :deadline future :order 8) (:name Overdue :deadline past :order 7) (:name University :order 1 :tag @uni) (:name BEST :order 2 :tag @BEST) (:name Monthly objectives :order 19 :and (:tag @objective :tag @monthly)) (:name Buying List :order 50 :and (:tag buy :not (:and (:children todo :todo [-])))) (:name Main Recommendations :order 51 :and (:tag recommendation :not (:and (:children todo :todo [-])))) (:discard (:and (:tag (@objective recommendation))))))))) | nil | (~/org/calendar.ics)                                                                                                                                                                                                 |
+| o | Objectives   | alltodo                                                                                                                                                                                                              |     | ((org-agenda-overriding-header Objectives) (org-agenda-dim-blocked-tasks nil) (org-agenda-files (append org-agenda-files (list (concat org-directory projects.org)))) (org-super-agenda-groups '((:name Monthly objectives :order 1 :tag @monthly) (:name Main objectives :order 2 :and (:tag @objective :tag main)) (:name Miscellaneous todos :order 10 :and (:todo (TODO CHORE TASK) :not (:tag (@routine @objective)))) (:discard :anything)))) |
+| W | Daily Chores | ((agenda  ((org-agenda-span 1) (org-agenda-overriding-header ) (org-agenda-start-day 0d) (org-agenda-skip-timestamp-if-done nil) (org-agenda-skip-scheduled-if-done nil) (org-agenda-sorting-strategy '(time-up deadline-up scheduled-up ts-up priority-down habit-down)) (org-agenda-remove-tags 't) (org-agenda-scheduled-leaders '([Scheduled]  Sched.%2dx: )) (org-agenda-deadline-leaders '([Deadline]  In %2d d.:  %2d d. ago: )) (org-agenda-time-grid '((daily today require-timed remove-match) (700 900 1100 1300 1500 1700 1900 2100 2300)  ┄┄┄┄┄ ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄)) (org-agenda-show-current-time-in-grid nil) (org-super-agenda-groups '((:name  :time-grid t :date today :order 1) (:name Incoming :and (:deadline t) :order 7) (:discard :anything))))) (alltodo  ((org-agenda-span 21) (org-agenda-overriding-header ) (org-agenda-start-day +0d) (org-agenda-sorting-strategy '(time-up deadline-up scheduled-up ts-up habit-down)) (org-agenda-remove-tags 't) (org-agenda-block-separator nil) (org-agenda-todo-keyword-format ) (org-agenda-prefix-format '((todo .  ◎ ))) (org-super-agenda-groups '((:name Miscellaneous todos :order 9 :and (:todo (TODO CHORE TASK) :not (:tag (@routine @objective)))) (:name Scheduled :scheduled t :order 7) (:discard (:anything))))))) |     |                                                                                                                                                                                                                      |
+
+#+begin_src elisp
+         ;; agenda "" ((org-agenda-span 1)
+         ;;            (org-agenda-overriding-header "Today's Agenda")
+         ;;            (org-agenda-files (append org-agenda-files (directory-files org-roam-dailies-directory t directory-files-no-dot-files-regexp)))
+         ;;            (org-agenda-start-day "+0d")
+         ;;            (org-agenda-remove-tags 't)
+         ;;            )
+         ;;        ("~/agenda"))
+      ;; '(("n" "Agenda and all TODOs"
+      ;;    ((agenda "")
+      ;;     (alltodo "")))
+      ;;  ("o" "Personal projects and objectives" tags-todo "@objectives"
+      ;;    ((agenda "")
+      ;;     (alltodo "")))
+      ;;  ("u" "University" tags "@uni"
+      ;;    ((agenda "")
+      ;;     (alltodo "")))
+      ;;  ("b" "BEST" tags "@BEST"
+      ;;    ((agenda "")
+      ;;     (alltodo "")))
+      ;;  ("l" "Shopping list" alltodo ""
+      ;;    ((org-agenda-files '("~/org/journal/shopping list.org"))))
+       ;JUST TO SEE WHAT ORG-AGENDA CAN DO
+       ;; ("P" "Printed agenda"
+       ;;   ((agenda "" ((org-agenda-span 7)                      ;; overview of appointments
+       ;;                (org-agenda-start-on-weekday nil)         ;; calendar begins today
+       ;;                (org-agenda-repeating-timestamp-show-all t)
+       ;;                (org-agenda-entry-types '(:timestamp :sexp))))
+       ;;    (agenda "" ((org-agenda-span 1)                      ; daily agenda
+       ;;                (org-deadline-warning-days 7)            ; 7 day advanced warning for deadlines
+       ;;                (org-agenda-todo-keyword-format "[ ]")
+       ;;                (org-agenda-scheduled-leaders '("" ""))
+       ;;                (org-agenda-prefix-format "%t%s")))
+       ;;    (todo "TODO"                                          ;; todos sorted by context
+       ;;          ((org-agenda-prefix-format "[ ] %T: ")
+       ;;           (org-agenda-sorting-strategy '(tag-up priority-down))
+       ;;           (org-agenda-todo-keyword-format "")
+       ;;           (org-agenda-overriding-header "\nTasks by Context\n------------------\n"))))
+       ;;   ((org-agenda-with-colors nil)
+       ;;    (org-agenda-compact-blocks t)
+       ;;    (org-agenda-remove-tags t)
+       ;;    (ps-number-of-columns 2)
+       ;;     (ps-landscape-mode t))
+       ;;   ("~/agenda.ps"))
+       ;;  other commands go here
+#+end_src
+
+*** TODO Cool renderer
+#+begin_src elisp
+(cl-defstruct +agenda-entry todo priority text tags planned low-effort marker project-status children)
+
+(defun +agenda-entry (headline &optional tags)
+  (let ((todo-type (org-element-property :todo-type headline))
+        (effort (org-element-property :EFFORT headline)))
+    (make-+agenda-entry
+     :todo (org-element-property :todo-keyword headline)
+     :priority (org-element-property :priority headline)
+     :text (org-element-property :raw-value headline)
+     :tags (or tags (org-element-property :tags headline))
+     :low-effort (and effort (eq todo-type 'todo) (< (org-duration-to-minutes effort) 20))
+     :marker (org-agenda-new-marker (org-element-property :begin headline)))))
+#+end_src
+
+#+begin_src elisp
+(defconst +agenda-projects-not-task-faces '(("NEXT" . '(:inherit org-todo :weight normal))
+                                            ("TODO" . '(:inherit org-todo :weight normal))))
+
+(defconst +agenda-projects-task-faces '(("NEXT" . '(:inherit org-todo :weight bold))
+                                        ("TODO" . '(:inherit org-todo :weight bold))))
+
+(defun +agenda-format-entry (prefix entry)
+  (let ((props (list 'nox-custom-agenda t
+                     'mouse-face 'highlight
+                     'undone-face nil
+                     'done-face 'org-agenda-done
+                     'org-marker (+agenda-entry-marker entry)
+                     'org-hd-marker (+agenda-entry-marker entry)
+                     'todo-state (+agenda-entry-todo entry)
+                     'org-todo-regexp org-todo-regexp
+                     'org-not-done-regexp org-not-done-regexp
+                     'org-complex-heading-regexp org-complex-heading-regexp
+                     'org-highest-priority org-highest-priority
+                     'org-lowest-priority org-lowest-priority
+	                 'tags (mapcar 'org-downcase-keep-props (+agenda-entry-tags entry))
+	                 'format `(() ,prefix)))
+        (text
+         (concat prefix
+                 (if (+agenda-entry-todo entry)
+                     (concat (+agenda-entry-todo entry) " ")
+                   "")
+                 (if (+agenda-entry-priority entry)
+                     (string ?\[ ?# (+agenda-entry-priority entry) ?\] ? )
+                   "")
+                 (+agenda-entry-text entry)
+                 (if (+agenda-entry-tags entry)
+                     (concat " :" (mapconcat #'identity (+agenda-entry-tags entry) ":") ":")
+                   ""))))
+
+	(add-text-properties (length prefix) (length text) '(org-heading t) text)
+    (setq text (concat (org-add-props text props) "\n"))
+    (org-agenda-highlight-todo text)))
+
+(defun +agenda-tip-for-effort (text low-effort &optional alt-text)
+  (if low-effort
+      (propertize text 'face '(:foreground "#b58900"))
+    (or alt-text text)))
+
+(defun +agenda-project-get-prefix (taskp parent-continuations &optional low-effort)
+  ;; IMPORTANT(nox): `parent-continuations' is in reverse order!
+  (let ((prefix "")
+        (tip t))
+    (if taskp
+        (dolist (cont parent-continuations)
+          (setq prefix (concat (if tip
+                                   (+agenda-tip-for-effort (if cont "├⮞ " "╰⮞ ") low-effort)
+                                 (if cont "│  " "   "))
+                        prefix)
+                tip nil))
+
+      (dolist (cont parent-continuations)
+        (setq prefix (concat (if tip (if cont "├─╴" "╰─╴") (if cont "│  " "   ")) prefix)
+              tip nil)))
+    (concat "  " prefix)))
+
+(defun +agenda-priority-sort (a b)
+  (let ((pa (or (+agenda-entry-priority a) ?B))
+        (pb (or (+agenda-entry-priority b) ?B)))
+    (< pa pb)))
+
+(defun +agenda-flatten-list (l)
+  (cond ((not l) nil)
+        ((atom l) (list l))
+        (t (append (+agenda-flatten-list (car l)) (+agenda-flatten-list (cdr l))))))
+
+(defun +agenda-project-printer (list &optional parent-continuations)
+  (setq list (sort list #'+agenda-priority-sort))
+
+  (if parent-continuations
+      (while list
+        (let ((entry (car list)))
+          (unless (cdr list) (setf (car parent-continuations) nil))
+
+          (when (eq (+agenda-entry-project-status entry) 'stuck)
+            (org-add-props (+agenda-entry-text entry) nil 'face 'org-priority))
+
+
+          (let ((org-todo-keyword-faces (if (+agenda-entry-project-status entry)
+                                            +agenda-projects-not-task-faces
+                                          +agenda-projects-task-faces)))
+            (insert
+             (+agenda-format-entry
+              (+agenda-project-get-prefix (not (+agenda-entry-project-status entry)) parent-continuations
+                                          (+agenda-entry-low-effort entry))
+              entry)))
+
+          (+agenda-project-printer (+agenda-entry-children entry) (cons t parent-continuations)))
+        (setq list (cdr list)))
+
+    (let ((first t)
+          (org-todo-keyword-faces +agenda-projects-not-task-faces))
+      (dolist (entry list)
+        (if first (setq first nil) (insert "\n"))
+
+        (when (eq (+agenda-entry-project-status entry) 'stuck)
+          (org-add-props (+agenda-entry-text entry) nil 'face 'org-priority))
+        (insert (+agenda-format-entry "  " entry))
+
+        (+agenda-project-printer (+agenda-entry-children entry) (list t))))))
+
+(defun +agenda-simple-printer (list)
+  (setq list (sort list #'+agenda-priority-sort))
+  (dolist (entry list)
+    (insert
+     (+agenda-format-entry (+agenda-tip-for-effort " ⮞" (+agenda-entry-low-effort entry) "  ") entry))))
+
+(defun +agenda-separator ()
+  (unless (or (bobp) org-agenda-compact-blocks
+			  (not org-agenda-block-separator))
+	(insert "\n"
+            (if (stringp org-agenda-block-separator)
+                org-agenda-block-separator
+			  (make-string (window-width) org-agenda-block-separator))
+		    "\n")))
+
+(defun +agenda-render-block (data title &optional printer)
+  (when data
+    (let ((begin (point)))
+      (+agenda-separator)
+      (insert (org-add-props title nil 'face 'org-agenda-structure) "\n")
+      (funcall (or printer #'+agenda-simple-printer) data)
+      (add-text-properties begin (point-max) `(org-agenda-type tags)))))
+#+end_src
+
+
+*** Sunrise-Sunset
+#+begin_src elisp
+(defun diary-sunrise ()
+  (let ((dss (diary-sunrise-sunset)))
+    (with-temp-buffer
+      (insert dss)
+      (goto-char (point-min))
+      (while (re-search-forward " ([^)]*)" nil t)
+	(replace-match "" nil nil))
+      (goto-char (point-min))
+      (search-forward ",")
+      (buffer-substring (point-min) (match-beginning 0)))))
+
+;; sunset
+(defun diary-sunset ()
+  (let ((dss (diary-sunrise-sunset))
+        start end)
+    (with-temp-buffer
+      (insert dss)
+      (goto-char (point-min))
+      (while (re-search-forward " ([^)]*)" nil t)
+        (replace-match "" nil nil))
+      (goto-char (point-min))
+      (search-forward ", ")
+      (setq start (match-end 0))
+      (search-forward " at")
+      (setq end (match-beginning 0))
+      (goto-char start)
+      (capitalize-word 1)
+      (buffer-substring start end))))
+#+end_src
+** org-ref
+#+begin_src elisp
+(use-package! org-ref
+  :custom
+    bibtex-completion-bibliography (directory-files citar-biblio-dir t directory-files-no-dot-files-regexp))
+    bibtex-completion-library-path '("~/org/roam/bib/")
+    bibtex-completion-notes-path "~/org/roam/references/"
+    bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+    bibtex-completion-additional-search-fields '(keywords)
+    bibtex-completion-display-formats
+    '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+      (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+      (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+      (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+      (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+#+end_src
+** org-transclusion
+#+begin_src elisp
+(use-package! org-transclusion
+  :after org
+  :init
+  (map!
+   :leader
+   :prefix "n"
+   (:prefix-map ("t" . "transclusion")
+        :desc "Remove transclusion" "d" #'org-transclusion-remove
+        :desc "Remove all transclusions" "D" #'org-transclusion-remove-all
+        :desc "Add transclusion" "a" #'org-transclusion-add
+        :desc "Add all transclusions" "A" #'org-transclusion-add-all
+        :desc "Refresh" "r" #'org-transclusion-refresh
+        :desc "Move to source" "s" #'org-transclusion-move-to-source
+        :desc "Transclusion mode" "t" #'org-transclusion-mode
+        (:prefix-map ("l" . "live-sync")
+             :desc "Start" "s" #'org-transclusion-live-sync-start
+             :desc "Exit" "e" #'org-transclusion-live-sync-exit))))
+
+(use-package! org-download
+    :custom
+    (org-download-method 'directory)
+    (org-download-image-dir (concat org-directory "images/screenshots/"))
+    (org-download-edit-cmd (concat "gimp " org-download-image-dir "%s"))
+    (org-download-screenshot-method "scrot -s %s")
+    (org-download-heading-lvl nil)
+    (org-download-timestamp "%Y%m%d-%H%M%S_")
+    (org-image-actual-width 300)
+    :bind
+    ("C-M-y" . org-download-screenshot)
+    :config
+    (require 'org-download))
+(setq org-screenshot-image-directory (concat org-directory "images/screenshots"))
+(setq org-attach-preferred-new-method 'dir)
+#+end_src
+
+** org-capture
+#+begin_src elisp
+(defvar org-journal--date-location-scheduled-time nil)
+
+(defun org-journal-date-location (&optional scheduled-time)
+  (let ((scheduled-time (or scheduled-time (org-read-date nil nil nil "Date:"))))
+    (setq org-journal--date-location-scheduled-time scheduled-time)
+    (org-journal-new-entry t (org-time-string-to-time scheduled-time))
+    (unless (eq org-journal-file-type 'daily)
+      (org-narrow-to-subtree))
+    (goto-char (point-max))))
+#+end_src
+#+begin_src elisp
+(setq! org-capture-templates
+      '(("r" "recommendations" plain (file+headline "recommendations.org" "TODO Organize")
+       "** %^{Author|No idea|Anonymous} - %^{Name|General works} :@leisure:%^{Type|book|film|article|series|music}:%^{Genre}: \n")
+      ("i" "ideas" plain (file "ideas.org")
+        "* %^{Name of the idea} :%^{Type|Project|Essay|Miscellaneous}: \n%^{Explanation}")
+      ("j" "Journal entry" plain (function org-journal-date-location)
+       "** %?\n%^{Type||SCHEDULED: |DEADLINE: }<%(princ org-journal--date-location-scheduled-time)>\n"
+       :jump-to-captured t)
+      ;("w" "word"  plain (file+headline "lang/vocabulary/en_vocab.org" "Words")
+        ;"** %^{Word}\t:%^{Type|noun|verb|adjective|adverb|phrasalverb}:%^{Part|essay|report|iletter|fletter|review|speaking|}:drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: multisided\n:END:\n%^{Example}\n*** Meaning\n%^{Meaning}\n*** Synonyms\n%^{Synonyms}" )
+      ;("x" "expression"  plain (file+headline "lang/vocabulary/en_vocab.org" "Expressions")
+        ;"** %^{Expression}\t:%^{Type|informal|formal}:%^{Part|essay|report|iletter|fletter|review|speaking|}:drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: multisided\n:END:\n%^{Example}\n*** Meaning\n%^{Meaning}\n*** Synonyms\n%^{Synonyms}" )
+      ))
+#+end_src
+
+** org-fragtog
+#+begin_src elisp
+(use-package! org-fragtog
+  :after org
+  :hook (org-mode . org-fragtog-mode))
+#+end_src
+** org-latex
+#+begin_src elisp
+(defun my/text-scale-adjust-latex-previews ()
+  "Adjust the size of latex preview fragments when changing the
+buffer's text scale."
+  (pcase major-mode
+    ('latex-mode
+     (dolist (ov (overlays-in (point-min) (point-max)))
+       (if (eq (overlay-get ov 'category)
+               'preview-overlay)
+           (my/text-scale--resize-fragment ov))))
+    ('org-mode
+     (dolist (ov (overlays-in (point-min) (point-max)))
+       (if (eq (overlay-get ov 'org-overlay-type)
+               'org-latex-overlay)
+           (my/text-scale--resize-fragment ov))))))
+
+(defun my/text-scale--resize-fragment (ov)
+  (overlay-put
+   ov 'display
+   (cons 'image
+         (plist-put
+          (cdr (overlay-get ov 'display))
+          :scale (+ 1.0 (* 0.25 text-scale-mode-amount))))))
+
+(add-hook 'text-scale-mode-hook #'my/text-scale-adjust-latex-previews)
+#+end_src
+
+#+RESULTS:
+| my/text-scale-adjust-latex-previews |
+
+* LaTeX
+:PROPERTIES:
+:header-args: :tangle ~/.doom.d/config.el
+:END:
+#+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! laas)
+(package! auctex)
+#+end_src
+** laas
+#+begin_src elisp
+(add-to-list 'org-latex-packages-alist '("" "tikz" t))
+(eval-after-load "preview"
+  '(add-to-list 'preview-default-preamble
+  "\\PreviewEnvironment{tikzpicture}" t))
+#+end_src
+
+#+begin_src elisp
+(use-package! laas
+  :hook (LaTeX-mode . laas-mode)
+        (org-mode . laas-mode)
+  :custom
+  (laas-basic-snippets
+     '(:cond laas-mathp
+       "!="    "\\neq"
+       "!>"    "\\mapsto"
+       "**"    "\\cdot"
+       "+-"    "\\pm"
+       "-+"    "\\mp"
+       "->"    "\\to"
+       "..."   "\\dots"
+       "<< "    "\\ll"
+       "<= "    "\\leq"
+       "<>"    "\\diamond"
+       "==<"    "\\impliedby"
+       "== "    "&="
+       "==>"    "\\implies" "=> " "\\Rightarrow" "<==" "\\Leftarrow"
+       ">= "    "\\geq" "<=>" "\\Leftrightarrow"
+       ">>  "    "\\gg"
+       "AA"    "\\forall"
+       "EE"    "\\exists"
+       "cb"    "^3"
+       "iff"   "\\iff"
+       "inn"   "\\in"
+       "notin" "\\not\\in"
+       "sr"    "^2"
+       "xx"    "\\times"
+       "|->"   "\\mapsto"
+       "|="    "\\models"
+       "||"    "\\mid"
+       "~="    "\\approx"
+       "~~"    "\\sim"
+       "[ ]"   "\square"
+       "sqrt"  "\\sqrt"
+
+       "arccos" "\\arccos"
+       "arccot" "\\arccot"
+       "arccot" "\\arccot"
+       "arccsc" "\\arccsc"
+       "arcsec" "\\arcsec"
+       "arcsin" "\\arcsin"
+       "arctan" "\\arctan"
+       "cos"    "\\cos"
+       "cot"    "\\cot"
+       "csc"    "\\csc"
+       "exp"    "\\exp"
+       "ln"     "\\ln"
+       "log"    "\\log"
+       "perp"   "\\perp"
+       "sin"    "\\sin"
+       "star"   "\\star"
+       "gcd"    "\\gcd"
+       "min"    "\\min"
+       "max"    "\\max"
+
+       ";.N"  "\\mathbb{N}"
+       ";.C"  "\\mathbb{C}"
+       ";.R"  "\\mathbb{R}"
+       ";.Q"  "\\mathbb{Q}"
+       ";.Z"  "\\mathbb{Z}"
+
+       ";a"  "\\alpha"
+       ";A"  "\\forall"        ";;A" "\\aleph"
+       ";b"  "\\beta "
+                        ";;;C" "\\arccos"
+       ";d"  "\\dot"         ";;d" "\\partial"
+       ";D"  "\\Delta"         ";;D" "\\nabla"
+       ";e"  "\\mathcal{E}"       ";;e" "\\varepsilon"   ";;;e" "\\exp"
+       ";E"  "\\exists"                               ";;;E" "\\ln"
+       ";f"  "\\phi"           ";;f" "\\varphi"
+       ";F"  "\\Phi"
+       ";g"  "\\gamma"                                ";;;g" "\\lg"
+       ";G"  "\\Gamma"                                ";;;G" "10^{?}"
+       ";h"  "\\eta"           ";;h" "\\hbar"
+       ";i"  "\\infty"            ";;i" "\\imath"
+       ";I"  "\\in"          ";;I" "\\Im"
+       ";;j" "\\jmath"
+       ";k"  "\\kappa"
+       ";l"  "\\mathcal{L}"        ";;l" "\\ell"          ";;;l" "\\log"
+       ";L"  "\\Lambda"
+       ";m"  "\\mu"
+       ";n"  "\\nabla"         ";;n" "\\vec{\\nabla}"     ";;;n" "\\ln"
+
+       ";o"  "\\omega"
+       ";O"  "\\Omega"         ";;O" "\\mho"
+       ";p"  "\\partial"            ";;p" "\\varpi"
+       ";P"  "\\Pi"
+       ";q"  "\\theta"         ";;q" "\\vartheta"
+
+       ";r"  "\\rho"           ";;r" "\\varrho"
+       ";;R" "\\Re"
+       ";s"  "\\sqrt"         ";;s" "\\varsigma"    ";;;s" "\\sin"
+       ";S"  "\\Sigma"                               ";;;S" "\\arcsin"
+       ";t"  "\\tau"                                 ";;;t" "\\tan"
+       ";;;T" "\\arctan"
+       ";u"  "\\upsilon"
+       ";U"  "\\Upsilon"
+       ";v"  "\\vec"          ";;v" "\\land"         ";;;v" "\\lor"
+       ";V"  "\\Phi"
+       ";w"  "\\xi"
+       ";W"  "\\Xi"
+       ";x"  "\\chi"
+       ";y"  "\\psi"
+       ";Y"  "\\Psi"
+       ";z"  "\\zeta"
+
+       ";0"  "\\emptyset"
+       ";8"  "\\infty"
+       ";!"  "\\neg"
+       ";^"  "\\uparrow"
+       ";&"  "\\wedge"
+       ";~"  "\\approx"        ";;~" "\\simeq"
+       ";_"  "\\downarrow"
+       ";+"  "\\cup"
+       ";-"  "\\leftrightarrow"";;-" "\\longleftrightarrow"
+       ";*"  "\\times"
+       ";/"  "\\not"
+       ";|"  "\\mapsto"        ";;|" "\\longmapsto"
+       ";\\" "\\setminus"
+       ";="  "\\Leftrightarrow"";;=" "\\Longleftrightarrow"
+       ";(" "\\langle"
+       ";)" "\\rangle"
+       ";[" "\\Leftarrow"     ";;[" "\\Longleftarrow"
+       ";]" "\\Rightarrow"    ";;]" "\\Longrightarrow"
+       ";{"  "\\subset"
+       ";}"  "\\supset"
+       ";<"  "\\leftarrow"    ";;<" "\\longleftarrow"  ";;;<" "\\min"
+       ";>"  "\\rightarrow"   ";;>" "\\longrightarrow" ";;;>" "\\max"
+       ";'"  "\\prime")))
+#+end_src
+* LSP
+:PROPERTIES:
+:header-args: :tangle ~/.doom.d/config.el
+:END:
+#+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! lsp-pyright
+  :recipe (:host github :repo "emacs-lsp/lsp-pyright"))
+(package! lsp-haskell)
+#+end_src
+
+#+begin_src elisp
+(use-package! lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp))))
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'c++-mode-hook 'lsp)
+;(setq lsp-beancount-langserver-executable "~/.cargo/bin/beancount-language-server")
+;(setq lsp-beancount-journal-file "cargo/bin/beancount-language-server")
+#+end_src
+
+* Miscellaneous
+:PROPERTIES:
+:header-args: :tangle ~/.doom.d/config.el
+:END:
+#+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! calibredb)
+(package! visual-regexp)
+(package! chess)
+(package! speed-type)
+(package! nov)
+(package! doct)
+(package! hledger-mode)
+(package! svelte-mode)
+(package! dirvish)
+(package! riscv-mode)
+(package! anki-editor)
+#+end_src
+** anki-editor
+#+begin_src elisp
+(use-package! anki-editor)
+  ;:hook (org-mode . anki-editor-mode))
+#+end_src
+
+** hl-todo
+#+begin_src elisp
+;; IMPROVE Asignar colores según función
+(after! hl-todo
+    (setq hl-todo-keyword-faces
+        '(
+        ("TODO" . "#fe6323")
+        ("DONE" . "#ff889f")
+        ("DONT" . "#f0f040")
+        ("HOLD" . "#f0ff8f")
+        ("NEXT" . "#1ca3a3")
+        ("PROG" . "#7cb8bb")
+        ("OKAY" . "#7cf8bb")
+        ("FAIL" . "#8c5353")
+        ("FIXME"  . "#ff0000")
+        ("FIXING"  . "#bff302")
+        ("FIXED"  . "#ff33b3")
+        ("REMOVE"  . "#909ff3")
+        ("DEBUG"  . "#1f9333")
+        ("IMPROVE" . "#7040f1")
+        ("NOTE"   . "#2fc100")
+        ("KLUDGE" . "#d0bf8f")
+        ("HACK"   . "#900f9f")
+        ("TEMP"   . "#308f8f")
+        ("XXX"  . "#cc9393"))))
+#+end_src
+
+#+RESULTS:
+: ((TODO . #fe6323) (DONE . #ff889f) (DONT . #f0f040) (HOLD . #f0ff8f) (NEXT . #1ca3a3) (PROG . #7cb8bb) (OKAY . #7cf8bb) (FAIL . #8c5353) (FIXME . #ff0000) (FIXING . #bff302) (FIXED . #ff33b3) (REMOVE . #909ff3) (DEBUG . #1f9333) (IMPROVE . #3020f1) (NOTE . #2fc100) (KLUDGE . #d0bf8f) (HACK . #900f9f) (TEMP . #308f8f) (XXX . #cc9393))
+** hledger
+#+begin_src elisp
+(use-package! hledger-mode
+  :custom
+  (hledger-jfile (concat org-directory "hledger.journal")))
+(add-to-list 'auto-mode-alist '("\\.journal\\'" . hledger-mode))
+#+end_src
+** calibredb
+#+begin_src elisp
+(use-package! calibredb
+  :defer t
+  :bind
+  ("C-c c" . calibredb)
+  :config
+  (setq calibredb-root-dir "~/Calibre Library")
+  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+  (setq calibredb-library-alist '(("~/Documents/Libraries/Computer Science", "~/Documents/Libraries/Mathematics", "~/Documents/Libraries/Selección")))
+  (setq calibredb-virtual-library-alist '(("1. University" . "@university")
+                                          ("2. Copywork" . "@copywork")
+                                          ("3. To Read" . "@toread epub")
+                                          ("4. Interesting Information" . "@investigate")
+                                          ("5. Language Learning" . "\\(@english\\|@deutsch\\)"))))
+#+end_src
+*** Keybindings
+#+begin_src elisp
+(defvar calibredb-show-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "?" #'calibredb-entry-dispatch)
+    (define-key map "l" #'calibredb-virtual-library-list)
+    (define-key map "L" #'calibredb-library-list)
+    (define-key map "n" #'calibredb-virtual-library-next)
+    (define-key map "N" #'calibredb-library-next)
+    (define-key map "p" #'calibredb-virtual-library-previous)
+    (define-key map "P" #'calibredb-library-previous)
+    (define-key map "o" #'calibredb-find-file)
+    (define-key map "O" #'calibredb-find-file-other-frame)
+    (define-key map "V" #'calibredb-open-file-with-default-tool)
+    (define-key map "s" #'calibredb-set-metadata-dispatch)
+    (define-key map "e" #'calibredb-export-dispatch)
+    (define-key map "q" #'calibredb-entry-quit)
+    (define-key map "y" #'calibredb-yank-dispatch)
+    (define-key map "," #'calibredb-quick-look)
+    (define-key map "." #'calibredb-open-dired)
+    (define-key map "\M-/" #'calibredb-rga)
+    (define-key map "\M-t" #'calibredb-set-metadata--tags)
+    (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
+    (define-key map "\M-A" #'calibredb-set-metadata--authors)
+    (define-key map "\M-T" #'calibredb-set-metadata--title)
+    (define-key map "\M-c" #'calibredb-set-metadata--comments)
+    map)
+  "Keymap for `calibredb-show-mode'.")
+(defvar calibredb-search-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [mouse-3] #'calibredb-search-mouse)
+    (define-key map (kbd "<RET>") #'calibredb-find-file)
+    (define-key map "?" #'calibredb-dispatch)
+    (define-key map "a" #'calibredb-add)
+    (define-key map "A" #'calibredb-add-dir)
+    (define-key map "c" #'calibredb-clone)
+    (define-key map "d" #'calibredb-remove)
+    (define-key map "D" #'calibredb-remove-marked-items)
+    (define-key map "j" #'calibredb-next-entry)
+    (define-key map "k" #'calibredb-previous-entry)
+    (define-key map "l" #'calibredb-virtual-library-list)
+    (define-key map "L" #'calibredb-library-list)
+    (define-key map "n" #'calibredb-virtual-library-next)
+    (define-key map "N" #'calibredb-library-next)
+    (define-key map "p" #'calibredb-virtual-library-previous)
+    (define-key map "P" #'calibredb-library-previous)
+    (define-key map "s" #'calibredb-set-metadata-dispatch)
+    (define-key map "S" #'calibredb-switch-library)
+    (define-key map "o" #'calibredb-find-file)
+    (define-key map "O" #'calibredb-find-file-other-frame)
+    (define-key map "v" #'calibredb-view)
+    (define-key map "V" #'calibredb-open-file-with-default-tool)
+    (define-key map "," #'calibredb-quick-look)
+    (define-key map "." #'calibredb-open-dired)
+    (define-key map "y" #'calibredb-yank-dispatch)
+    (define-key map "b" #'calibredb-catalog-bib-dispatch)
+    (define-key map "e" #'calibredb-export-dispatch)
+    (define-key map "r" #'calibredb-search-refresh-and-clear-filter)
+    (define-key map "R" #'calibredb-search-clear-filter)
+    (define-key map "q" #'calibredb-search-quit)
+    (define-key map "m" #'calibredb-mark-and-forward)
+    (define-key map "f" #'calibredb-toggle-favorite-at-point)
+    (define-key map "x" #'calibredb-toggle-archive-at-point)
+    (define-key map "h" #'calibredb-toggle-highlight-at-point)
+    (define-key map "u" #'calibredb-unmark-and-forward)
+    (define-key map "i" #'calibredb-edit-annotation)
+    (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
+    (define-key map (kbd "<backtab>") #'calibredb-toggle-view)
+    (define-key map (kbd "TAB") #'calibredb-toggle-view-at-point)
+    (define-key map "\M-n" #'calibredb-show-next-entry)
+    (define-key map "\M-p" #'calibredb-show-previous-entry)
+    (define-key map "/" #'calibredb-search-live-filter)
+    (define-key map "\M-t" #'calibredb-set-metadata--tags)
+    (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
+    (define-key map "\M-A" #'calibredb-set-metadata--authors)
+    (define-key map "\M-T" #'calibredb-set-metadata--title)
+    (define-key map "\M-c" #'calibredb-set-metadata--comments)
+    map)
+  "Keymap for `calibredb-search-mode'.")
+
+#+end_src
+** nov-el
+#+begin_src elisp
+(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+#+end_src
+** evil-mc
+#+begin_src elisp
+(evil-define-key 'normal 'global
+  (kbd "C-ñ") #'evil-mc-pause-cursors
+  (kbd "ñ")   #'evil-mc-make-cursor-here)
+#+end_src
+** citar
+#+begin_src elisp
+
+(defvar citar-biblio-dir (concat org-roam-directory "bib"))
+
+(use-package! citar
+  :bind (("C-c b" . citar-insert-citation)
+         :map minibuffer-local-map
+         ("M-b" . citar-insert-preset))
+  :custom
+  (citar-org-roam-note-title-template "${author editor} :: ${title}\n#+filetags: :__draft__:")
+  (citar-bibliography (directory-files citar-biblio-dir t directory-files-no-dot-files-regexp)))
+#+end_src
+
+** svelte-mode
+SGML mode, which svelte-mode is derived from, automatically closes your current tag for you with the C-c C-e shortcut (sgml-close-tag). This however does not work for components that share their name with unclosed html tags, like for example the Link component from svelte-routing. SGML mode by default checks whether tags are supposed to be closed or not by comparing tag names with lists of element names case-insensitively, so <Link> is equivalent to <link>. The following configuration snippet makes the comparison of tag names by SGML mode case-sensitive when svelte-mode is the current active major-mode in the buffer. Just add it to your config file and you're good to go. (explanation copied from [[https://github.com/leafOfTree/svelte-mode][its repo]])
+#+begin_src elisp
+(defun svelte-mode-sgml-empty-tag-p-advice (old-function tag-name)
+  "Advice function intended to wrap around `sgml-empty-tag-p
+
+Makes case significant when checking whether tags need to be
+closed or not, to not confuse elements with Svelte components."
+  (if (eq major-mode 'svelte-mode)
+      (assoc-string tag-name sgml-empty-tags)
+    (funcall old-function tag-name)))
+
+(defun svelte-mode-sgml-unclosed-tag-p-advice (old-function tag-name)
+  "Advice function intended to wrap around `sgml-unclosed-tag-p
+
+Makes case significant when checking whether tags need to be
+closed or not, to not confuse elements with Svelte components."
+  (if (eq major-mode 'svelte-mode)
+      (assoc-string tag-name sgml-unclosed-tags)
+    (funcall old-function tag-name)))
+
+(advice-add 'sgml-empty-tag-p :around 'svelte-mode-sgml-empty-tag-p-advice)
+(advice-add 'sgml-unclosed-tag-p :around 'svelte-mode-sgml-unclosed-tag-p-advice)
+#+end_src
+** dirvish
+Interesting complement to dired
+#+begin_src elisp
+(use-package! dirvish
+  :ensure t
+  :init
+  ;; Let Dirvish take over Dired globally
+  (dirvish-override-dired-mode))
+#+end_src
+** plantuml
+#+begin_src elisp
+;; (setq plantuml-jar-path "~/.plantuml/plantuml.jar")
+;; (setq plantuml-default-exec-mode 'jar)
+;; (setq org-plantuml-jar-path
+;;       (expand-file-name "/home/luis/.plantuml/plantuml.jar"))
+;; (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+#+end_src
+** r
+#+begin_src elisp
+(require 'ess-site)
+#+end_src
+** cfwl
+#+begin_src
+(setq byte-compile-warnings '((cl-functions)))
+(require 'cl-lib)
+(require 'calfw-cal)
+(require 'calfw-ical)
+;(require 'calfw-howm)
+(require 'calfw-org)
+
+(defun lcp/open-calendar ()
+  (interactive)
+  (cfw:open-calendar-buffer
+   :contents-sources
+   (list
+    (cfw:org-create-source)  ; orgmode source
+    ;(cfw:howm-create-source "Blue")  ; howm source
+    (cfw:cal-create-source "Orange") ; diary source
+    ;(cfw:ical-create-source "Moon" "~/moon.ics" "Gray")  ; ICS source1
+    ;(cfw:ical-create-source "gcal" "https://..../basic.ics" "IndianRed") ; google calendar ICS
+   )))
+#+end_src
+#+begin_src
+(custom-set-faces
+ '(cfw:face-title ((t (:foreground "#f0dfaf" :weight bold :height 2.0 :inherit variable-pitch))))
+ '(cfw:face-header ((t (:foreground "#d0bf8f" :weight bold))))
+ '(cfw:face-sunday ((t :foreground "#cc9393" :background "grey10" :weight bold)))
+ '(cfw:face-saturday ((t :foreground "#8cd0d3" :background "grey10" :weight bold)))
+ '(cfw:face-holiday ((t :background "grey10" :foreground "#8c5353" :weight bold)))
+ '(cfw:face-grid ((t :foreground "DarkGrey")))
+ '(cfw:face-default-content ((t :foreground "#bfebbf")))
+ '(cfw:face-periods ((t :foreground "cyan")))
+ '(cfw:face-day-title ((t :background "grey10")))
+ '(cfw:face-default-day ((t :weight bold :inherit cfw:face-day-title)))
+ '(cfw:face-annotation ((t :foreground "RosyBrown" :inherit cfw:face-day-title)))
+ '(cfw:face-disable ((t :foreground "DarkGray" :inherit cfw:face-day-title)))
+ '(cfw:face-today-title ((t :background "#7f9f7f" :weight bold)))
+ '(cfw:face-today ((t :background: "grey10" :weight bold)))
+ '(cfw:face-select ((t :background "#2f2f2f")))
+ '(cfw:face-toolbar ((t :foreground "Steelblue4" :background "Steelblue4")))
+ '(cfw:face-toolbar-button-off ((t :foreground "Gray10" :weight bold)))
+ '(cfw:face-toolbar-button-on ((t :foreground "Gray50" :weight bold))))
+#+end_src
+#+begin_src
+;; Default setting
+;; (setq cfw:fchar-junction ?+
+;;       cfw:fchar-vertical-line ?|
+;;       cfw:fchar-horizontal-line ?-
+;;       cfw:fchar-left-junction ?+
+;;       cfw:fchar-right-junction ?+
+;;       cfw:fchar-top-junction ?+
+;;       cfw:fchar-top-left-corner ?+
+;;       cfw:fchar-top-right-corner ?+ )
+;; Unicode characters
+(setq cfw:fchar-junction ?╋
+      cfw:fchar-vertical-line ?┃
+      cfw:fchar-horizontal-line ?━
+      cfw:fchar-left-junction ?┣
+      cfw:fchar-right-junction ?┫
+      cfw:fchar-top-junction ?┯
+      cfw:fchar-top-left-corner ?┏
+      cfw:fchar-top-right-corner ?┓)
+#+end_src
+
+** holidays
+*** General
+#+begin_src elisp
+(setq holiday-general-holidays
+      '((holiday-fixed 1 1 "New Year's Day")
+        (holiday-fixed 2 14 "Valentine's Day")
+        (holiday-fixed 10 31 "Halloween")
+        ;; Yankis
+        (holiday-float 11 4 4 "Thanksgiving")
+        (holiday-fixed 4 1 "April Fools' Day")
+        (holiday-float 1 1 3 "Martin Luther King Day")
+        (holiday-float 5 1 -1 "Memorial Day")
+        (holiday-fixed 6 14 "Flag Day")
+        (holiday-fixed 7 4 "Independence Day")
+        (holiday-float 9 1 1 "Labor Day")
+        (holiday-fixed 3 17 "St. Patrick's Day")
+        ))
+;; USEFUL when I go to USA
+;; (holiday-fixed 1 1 "New Year's Day")
+;;  (holiday-fixed 2 2 "Groundhog Day")
+;;  (holiday-fixed 2 14 "Valentine's Day")
+;;  (holiday-float 2 1 3 "President's Day")
+;;  (holiday-float 5 0 2 "Mother's Day")
+;;  (holiday-float 6 0 3 "Father's Day")
+;;  (holiday-float 10 1 2 "Columbus Day")
+;;  (holiday-fixed 11 11 "Veteran's Day")
+#+end_src
+
+*** Local (Madrid + Spain)
+#+begin_src elisp
+(setq holiday-other-holidays
+      '((holiday-fixed 5 1 "Día del Trabajo")
+        (holiday-fixed 3 19 "Día del Padre")
+        (holiday-float 5 0 1 "Día de la Madre")
+        (holiday-fixed 5 2 "Día de la Independencia en Madrid")
+        (holiday-fixed 5 15 "San Isidro")
+        (holiday-fixed 10 12 "Día de la Hispanidad")
+        (holiday-fixed 11 1 "Día de Todos los Santos")
+        (holiday-fixed 12 6 "Día de la Constitución Española")
+        (holiday-fixed 12 8 "Inmaculada Concepción")
+        ))
+#+end_src
