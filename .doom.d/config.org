@@ -9,9 +9,6 @@
       user-mail-address "camacho.luis@protonmail.com")
 #+end_src
 
-#+RESULTS:
-: camacho.luis@protonmail.com
-
 I don't like custom.el >:(
 #+begin_src elisp
 (setq custom-file "/dev/null")
