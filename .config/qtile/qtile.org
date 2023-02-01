@@ -76,7 +76,8 @@ This is for the stack (in case I ever toggle it):
     Key([mod], "d", lazy.spawn("rofi -show drun"), desc="Start application"),
     Key([mod], "e", lazy.spawn("emacs"), desc="Yeah baby that's what I've been waiting for, that's what is all about"),
     Key([mod], "w", lazy.spawn("librewolf"), desc="Browser"),
-    Key([mod], "x", lazy.spawn(home + "/.config/qtile/powermenu.sh"), desc="File Manager"),#function(show_power_menu)),
+    Key([mod], "x", lazy.spawn(home + "/.config/qtile/powermenu.sh")),#function(show_power_menu)),
+    Key([mod, "control"], "n", lazy.spawn("nemo"), desc="File Manager"),
 #+end_src
 ** Scratchpad keys
 #+begin_src python

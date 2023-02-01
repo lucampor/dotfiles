@@ -1,9 +1,9 @@
-#+title: Literate Config
-#+startup: fold
-* Basic things
 :PROPERTIES:
 :header-args: :tangle ~/.doom.d/config.el
 :END:
+#+title: Literate Config
+#+startup: fold
+* Basic things
 #+begin_src elisp
 (setq user-full-name "Luis Camacho"
       user-mail-address "camacho.luis@protonmail.com")
@@ -29,9 +29,6 @@ I don't like custom.el >:(
 #+end_src
 
 * Keybindings
-:PROPERTIES:
-:header-args: :tangle ~/.doom.d/config.el
-:END:
 #+begin_src elisp
 (map! :leader
       :desc "Calfw calendar" "y" #'yank-from-kill-ring
@@ -50,9 +47,6 @@ I don't like custom.el >:(
 #+end_src
 
 * UI
-:PROPERTIES:
-:header-args: :tangle ~/.doom.d/config.el
-:END:
 #+begin_src elisp
 (set-frame-parameter nil 'alpha-background 100) ; For current frame
 (add-to-list 'default-frame-alist '(alpha . 100)) ; For all new frames henceforth
@@ -75,9 +69,6 @@ Since I use this mainly to embellish my org-roam notes, I decided to add ~pretti
 #+end_src
 Later, if I see I could use it in more places, I'll make it so that the list changes depending on the extension
 * org-mode
-:PROPERTIES:
-:header-args: :tangle ~/.doom.d/config.el
-:END:
 #+begin_src elisp :tangle ~/.doom.d/packages.el
 (package! org-drill)
 (package! org-ref)
@@ -93,19 +84,11 @@ Later, if I see I could use it in more places, I'll make it so that the list cha
 #+begin_src elisp
 (after! org-mode
   (setq org-hide-emphasis-markers nil))
-
-
-
-(custom-set-variables
-    '(org-babel-load-languages
-      '((R . t)
-        (emacs-lisp . t)
-        (plantuml . t)))
-    '(org-confirm-babel-evaluate nil))
 (org-babel-do-load-languages
         'org-babel-load-languages
         '((R . t)
           (emacs-lisp . t)
+          (gnuplot . t)
           (plantuml . t)))
 #+end_src
 #+begin_src elisp
@@ -154,10 +137,6 @@ Later, if I see I could use it in more places, I'll make it so that the list cha
 ;; (defun jethro/tag-new-node-as-draft ()
 ;;   (org-roam-tag-add '("__draft__")))
 ;; (add-hook 'org-roam-capture-new-node-hook #'jethro/tag-new-node-as-draft)
-#+end_src
-
-** org-screenshot
-#+begin_src elisp
 #+end_src
 
 ** org-roam
@@ -390,6 +369,23 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
       (org-agenda-todo-ignore-deadlines 'far)
       )
 (org-super-agenda-mode)
+
+
+(require 'org-download)
+(use-package! org-download
+    :custom
+    (org-download-method 'directory)
+    (org-download-image-dir (concat org-directory "images/screenshots/"))
+    (org-download-edit-cmd (concat "gimp " org-download-image-dir "%s"))
+    (org-download-screenshot-method "scrot -s %s")
+    (org-download-heading-lvl nil)
+    (org-download-timestamp "%Y%m%d-%H%M%S_")
+    (org-image-actual-width 300)
+    :bind
+    ("C-M-y" . org-download-screenshot)
+    )
+(setq org-screenshot-image-directory (concat org-directory "images/screenshots"))
+(setq org-attach-preferred-new-method 'dir)
 #+end_src
 
 Now the tags appear in a better spot:
@@ -423,7 +419,6 @@ Now the tags appear in a better spot:
 (setq org-agenda-custom-commands
       '(("n" "Main agenda"
          ((agenda "" ((org-agenda-span 31)
-                      (org-agenda-include-diary nil)
                       ))
           (alltodo "" ((org-agenda-overriding-header "")
                        (org-super-agenda-groups
@@ -527,11 +522,6 @@ Now the tags appear in a better spot:
                         ))))))
         ))
 #+end_src
-
-#+RESULTS:
-| n | Main agenda  | ((agenda  ((org-agenda-span 31) (org-agenda-include-diary nil))) (alltodo  ((org-agenda-overriding-header ) (org-super-agenda-groups '((:name Due Soon :deadline future :order 8) (:name Overdue :deadline past :order 7) (:name University :order 1 :tag @uni) (:name BEST :order 2 :tag @BEST) (:name Monthly objectives :order 19 :and (:tag @objective :tag @monthly)) (:name Buying List :order 50 :and (:tag buy :not (:and (:children todo :todo [-])))) (:name Main Recommendations :order 51 :and (:tag recommendation :not (:and (:children todo :todo [-])))) (:discard (:and (:tag (@objective recommendation))))))))) | nil | (~/org/calendar.ics)                                                                                                                                                                                                 |
-| o | Objectives   | alltodo                                                                                                                                                                                                              |     | ((org-agenda-overriding-header Objectives) (org-agenda-dim-blocked-tasks nil) (org-agenda-files (append org-agenda-files (list (concat org-directory projects.org)))) (org-super-agenda-groups '((:name Monthly objectives :order 1 :tag @monthly) (:name Main objectives :order 2 :and (:tag @objective :tag main)) (:name Miscellaneous todos :order 10 :and (:todo (TODO CHORE TASK) :not (:tag (@routine @objective)))) (:discard :anything)))) |
-| W | Daily Chores | ((agenda  ((org-agenda-span 1) (org-agenda-overriding-header ) (org-agenda-start-day 0d) (org-agenda-skip-timestamp-if-done nil) (org-agenda-skip-scheduled-if-done nil) (org-agenda-sorting-strategy '(time-up deadline-up scheduled-up ts-up priority-down habit-down)) (org-agenda-remove-tags 't) (org-agenda-scheduled-leaders '([Scheduled]  Sched.%2dx: )) (org-agenda-deadline-leaders '([Deadline]  In %2d d.:  %2d d. ago: )) (org-agenda-time-grid '((daily today require-timed remove-match) (700 900 1100 1300 1500 1700 1900 2100 2300)  ┄┄┄┄┄ ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄)) (org-agenda-show-current-time-in-grid nil) (org-super-agenda-groups '((:name  :time-grid t :date today :order 1) (:name Incoming :and (:deadline t) :order 7) (:discard :anything))))) (alltodo  ((org-agenda-span 21) (org-agenda-overriding-header ) (org-agenda-start-day +0d) (org-agenda-sorting-strategy '(time-up deadline-up scheduled-up ts-up habit-down)) (org-agenda-remove-tags 't) (org-agenda-block-separator nil) (org-agenda-todo-keyword-format ) (org-agenda-prefix-format '((todo .  ◎ ))) (org-super-agenda-groups '((:name Miscellaneous todos :order 9 :and (:todo (TODO CHORE TASK) :not (:tag (@routine @objective)))) (:name Scheduled :scheduled t :order 7) (:discard (:anything))))))) |     |                                                                                                                                                                                                                      |
 
 #+begin_src elisp
          ;; agenda "" ((org-agenda-span 1)
@@ -726,7 +716,6 @@ Now the tags appear in a better spot:
       (add-text-properties begin (point-max) `(org-agenda-type tags)))))
 #+end_src
 
-
 *** Sunrise-Sunset
 #+begin_src elisp
 (defun diary-sunrise ()
@@ -774,43 +763,6 @@ Now the tags appear in a better spot:
       (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
       (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
 #+end_src
-** org-transclusion
-#+begin_src elisp
-(use-package! org-transclusion
-  :after org
-  :init
-  (map!
-   :leader
-   :prefix "n"
-   (:prefix-map ("t" . "transclusion")
-        :desc "Remove transclusion" "d" #'org-transclusion-remove
-        :desc "Remove all transclusions" "D" #'org-transclusion-remove-all
-        :desc "Add transclusion" "a" #'org-transclusion-add
-        :desc "Add all transclusions" "A" #'org-transclusion-add-all
-        :desc "Refresh" "r" #'org-transclusion-refresh
-        :desc "Move to source" "s" #'org-transclusion-move-to-source
-        :desc "Transclusion mode" "t" #'org-transclusion-mode
-        (:prefix-map ("l" . "live-sync")
-             :desc "Start" "s" #'org-transclusion-live-sync-start
-             :desc "Exit" "e" #'org-transclusion-live-sync-exit))))
-
-(use-package! org-download
-    :custom
-    (org-download-method 'directory)
-    (org-download-image-dir (concat org-directory "images/screenshots/"))
-    (org-download-edit-cmd (concat "gimp " org-download-image-dir "%s"))
-    (org-download-screenshot-method "scrot -s %s")
-    (org-download-heading-lvl nil)
-    (org-download-timestamp "%Y%m%d-%H%M%S_")
-    (org-image-actual-width 300)
-    :bind
-    ("C-M-y" . org-download-screenshot)
-    :config
-    (require 'org-download))
-(setq org-screenshot-image-directory (concat org-directory "images/screenshots"))
-(setq org-attach-preferred-new-method 'dir)
-#+end_src
-
 ** org-capture
 #+begin_src elisp
 (defvar org-journal--date-location-scheduled-time nil)
@@ -876,10 +828,31 @@ buffer's text scale."
 #+RESULTS:
 | my/text-scale-adjust-latex-previews |
 
+** org-transclusion
+#+begin_src elisp
+(use-package! org-transclusion
+  :after org
+  :init
+  (map!
+   :leader
+   :prefix "n"
+   (:prefix-map ("t" . "transclusion")
+        :desc "Remove transclusion" "d" #'org-transclusion-remove
+        :desc "Remove all transclusions" "D" #'org-transclusion-remove-all
+        :desc "Add transclusion" "a" #'org-transclusion-add
+        :desc "Add all transclusions" "A" #'org-transclusion-add-all
+        :desc "Refresh" "r" #'org-transclusion-refresh
+        :desc "Move to source" "s" #'org-transclusion-move-to-source
+        :desc "Transclusion mode" "t" #'org-transclusion-mode
+        (:prefix-map ("l" . "live-sync")
+             :desc "Start" "s" #'org-transclusion-live-sync-start
+             :desc "Exit" "e" #'org-transclusion-live-sync-exit))))
+#+end_src
+
+#+RESULTS:
+: dir
+
 * LaTeX
-:PROPERTIES:
-:header-args: :tangle ~/.doom.d/config.el
-:END:
 #+begin_src elisp :tangle ~/.doom.d/packages.el
 (package! laas)
 (package! auctex)
@@ -1028,9 +1001,6 @@ buffer's text scale."
        ";'"  "\\prime")))
 #+end_src
 * LSP
-:PROPERTIES:
-:header-args: :tangle ~/.doom.d/config.el
-:END:
 #+begin_src elisp :tangle ~/.doom.d/packages.el
 (package! lsp-pyright
   :recipe (:host github :repo "emacs-lsp/lsp-pyright"))
@@ -1048,12 +1018,9 @@ buffer's text scale."
 ;(setq lsp-beancount-langserver-executable "~/.cargo/bin/beancount-language-server")
 ;(setq lsp-beancount-journal-file "cargo/bin/beancount-language-server")
 #+end_src
-
 * Miscellaneous
-:PROPERTIES:
-:header-args: :tangle ~/.doom.d/config.el
-:END:
 #+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! gnuplot-mode)
 (package! calibredb)
 (package! visual-regexp)
 (package! chess)
@@ -1071,7 +1038,6 @@ buffer's text scale."
 (use-package! anki-editor)
   ;:hook (org-mode . anki-editor-mode))
 #+end_src
-
 ** hl-todo
 #+begin_src elisp
 ;; IMPROVE Asignar colores según función
@@ -1378,4 +1344,19 @@ Interesting complement to dired
         (holiday-fixed 12 6 "Día de la Constitución Española")
         (holiday-fixed 12 8 "Inmaculada Concepción")
         ))
+#+end_src
+** pylint
+#+begin_src elisp
+;; Configure Flymake for Python
+(when (load "flymake" t)
+  (defun flymake-pylint-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                       'flymake-create-temp-inplace))
+           (local-file (file-relative-name
+                        temp-file
+                        (file-name-directory buffer-file-name))))
+      (list "epylint" (list local-file))))
+  (add-to-list 'flymake-allowed-file-name-masks
+               '("\\.py\\'" flymake-pylint-init)))
+
 #+end_src
