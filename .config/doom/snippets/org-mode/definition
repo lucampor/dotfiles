@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: definition
+# uuid: def
+# key: <md
+# condition: t
+# group: theorem
+# --
+#+attr_latex: :options {$1}
+#+begin_definition
+$0
+#+end_definition

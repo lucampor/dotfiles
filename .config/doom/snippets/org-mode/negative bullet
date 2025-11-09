@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: negative bullet
+# key: -x
+# --
+- ❌ $0

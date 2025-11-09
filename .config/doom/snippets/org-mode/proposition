@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: proposition
+# uuid: thrpp
+# key: <mp
+# condition: t
+# group: theorem
+# --
+#+begin_proposition
+$0
+#+end_proposition

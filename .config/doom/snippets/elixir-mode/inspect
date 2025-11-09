@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: inspect
+# key: print
+# --
+IO.inspect($0)

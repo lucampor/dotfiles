@@ -1,0 +1,264 @@
+format = """\
+[](fg:color0)\
+$username\
+[](fg:color0 bg:color1)\
+$directory\
+[](fg:color1 bg:color4)\
+$git_branch\
+$git_status\
+[](fg:color4 bg:color3)\
+$all\
+$package\
+$jobs\
+$battery\
+$time\
+$cmd_duration\
+$character"""
+
+palette = "oceanic_next"
+
+add_newline = true
+
+[line_break]
+disabled = true
+
+[username]
+show_always = true
+style_user = "fg:color15 bg:color0"
+style_root = "fg:color15 bg:color1"
+format = '[忍耐力]($style)'
+
+[directory]
+style = "fg:color0 bg:color1"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"/home/shared" = "🖫 "
+# ".config" = "🔧 "
+# "Projekte" = "🎨 "
+# "org" = "🖋 "
+# "Dokumente" = "📖 "
+# "Downloads" = " "
+# "Musik" = "🎜 "
+# "Bilder" = " "
+# "Videos" = " "
+
+[git_branch]
+symbol = ""
+style = "fg:color0 bg:color4"
+format = '[ $symbol $branch(:$remote_branch) ]($style)'
+
+[git_status]
+style = "fg:color0 bg:color4"
+ahead = "⇡${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+behind = "⇣${count}"
+deleted = "x"
+format = '[$all_status$ahead_behind ]($style)'
+
+[aws]
+symbol = " "
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[conda]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[dart]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[zig]
+symbol = "⚡"
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[c]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[docker_context]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol $context]($style) $path '
+
+[elixir]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[elm]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[golang]
+symbol = "ﳑ"
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[haskell]
+symbol = "λ"
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[java]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[julia]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[lua]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[nim]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[nix_shell]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[nodejs]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[perl]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[php]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[python]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[ruby]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[rust]
+symbol = "🦀"
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[swift]
+symbol = "ﯣ"
+style = "fg:color15 bg:color3"
+format = '[ $symbol ]($style)'
+
+[package]
+symbol = ""
+style = "fg:color15 bg:color3"
+format = "[ $symbol ]($style)"
+disabled = true
+
+[cmd_duration]
+min_time = 1
+style = "fg:color0 bg:color7"
+format = "[ $duration ]($style)"
+disabled = true
+
+[jobs]
+symbol = "華"
+style = "fg:#CCCCCC bg:#787878"
+format = "[ $symbol]($style)"
+
+[battery]
+full_symbol = " "
+charging_symbol = " "
+discharging_symbol = " "
+unknown_symbol = " "
+empty_symbol = " "
+format = "[ $symbol$percentage ](fg:#CCCCCC bg:#787878)"
+disabled = true
+
+[[battery.display]]
+threshold = 15
+style = "bold fg:#CCCCCC"
+
+[[battery.display]]
+threshold = 50
+style = "fg:#CCCCCC"
+
+[[battery.display]]
+threshold = 101
+style = "bold fg:#CCCCCC"
+
+[time]
+disabled = true
+time_format = "%R"
+style = "bg:#787878"
+format = '[ $time ](fg:#CCCCCC bg:#696969)'
+
+[character]
+#
+success_symbol = "[](fg:color3) \n [🩧](fg:color15)"
+error_symbol = "[](fg:color3) \n [🩠](fg:color15)"
+
+[palettes.catppuccin_latte]
+rosewater = "#dc8a78"
+flamingo = "#dd7878"
+pink = "#ea76cb"
+mauve = "#8839ef"
+red = "#d20f39"
+maroon = "#e64553"
+peach = "#fe640b"
+yellow = "#df8e1d"
+green = "#40a02b"
+teal = "#179299"
+sky = "#04a5e5"
+sapphire = "#209fb5"
+blue = "#1e66f5"
+lavender = "#7287fd"
+text = "#4c4f69"
+subtext1 = "#5c5f77"
+subtext0 = "#6c6f85"
+overlay2 = "#7c7f93"
+overlay1 = "#8c8fa1"
+overlay0 = "#9ca0b0"
+surface2 = "#acb0be"
+surface1 = "#bcc0cc"
+surface0 = "#ccd0da"
+base = "#eff1f5"
+mantle = "#e6e9ef"
+crust = "#dce0e8"
+
+[palettes.oceanic_next]
+color0 = "#1B2B34"
+color8 = "#343D46"
+color1 = "#EC5F67"
+color9 = "#EC5F67"
+color2 = "#99C794"
+color10 = "#99C794"
+color3 = "#FAC863"
+color11 = "#FAC863"
+color4 = "#6699CC"
+color12 = "#6699CC"
+color5 = "#C594C5"
+color13 = "#C594C5"
+color6 = "#5FB3B3"
+color14 = "#5FB3B3"
+color7 = "#A7ADBA"
+color15 = "#D8DEE9"

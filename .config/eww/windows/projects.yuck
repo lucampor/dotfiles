@@ -1,0 +1,36 @@
+(defwidget project [name ?script ?img]
+    (button 
+        :tooltip "${name}"
+        :style "background-image: url('images/projects/${img ?: name}')" 
+        :class "project" 
+        :onclick {"scripts/open_roadmap ${strlength(script) > 0 ? "-s '${script}'" : name}"}
+    (label :class "project-label" :text "${name}" :visible false)))
+
+(defwidget project-list []
+    (box :orientation "v"
+        (project :name "SCHEDULE"
+                 :script "libreoffice -o ${get_env("HOME")}/Dokumente/Wöchentlicher_Zeitplan.ods")
+        (project :name "unity")
+        (project :name "gaycon")
+        (project :name "ableton")
+        (project :name "dnd")
+                 ;:script "emacs ${get_env("HOME")}/org/roam/dnd/campaign.org")
+        (project :name "fadaba")
+        (project :name "genart")
+        (project :name "russkii")
+        (project :name "tfg")
+        (project :name "vulcanus")
+        (project :name "deutschland")
+))
+
+(defwindow projects
+           :monitor 0
+           :geometry (geometry :x "-1%"
+                               :y "0%"
+                               :width "5%"
+                               :height "60%"
+                               :anchor "center right")
+           :stacking "overlay"
+           :windowtype "normal"
+           :wm-ignore "true"
+  (project-list))

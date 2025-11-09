@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: corollary
+# uuid: thrc
+# key: <mc
+# condition: t
+# group: theorem
+# --
+#+begin_corollary
+$0
+#+end_corollary

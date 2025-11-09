@@ -1,0 +1,27 @@
+{
+    "wallpaper": "/home/myskat/.config/wal/utagawa_hiroshige_-_a_red_plum_branch_against_the_summer_moon.png",
+    "alpha": "100",
+    "special": {
+        "background": "#1B2B35",
+        "foreground": "#CDD3DE",
+        "cursor": "#CDD3DE"
+    },
+    "colors": {
+        "color0": "#1B2B34",
+        "color8": "#343D46",
+        "color1": "#EC5F67",
+        "color9": "#EC5F67",
+        "color2": "#99C794",
+        "color10": "#99C794",
+        "color3": "#FAC863",
+        "color11": "#FAC863",
+        "color4": "#6699CC",
+        "color12": "#6699CC",
+        "color5": "#C594C5",
+        "color13": "#C594C5",
+        "color6": "#5FB3B3",
+        "color14": "#5FB3B3",
+        "color7": "#A7ADBA",
+        "color15": "#D8DEE9"
+    }
+}

@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+#emacs $HOME/org/projects/$1.org &
+#COMMAND="kitty nvim $HOME/org/journal/$1.org &"
+COMMAND="emacsclient -c --alternate-editor="" --no-wait $HOME/org/journal/$1.org"
+
+while (( $# )); do
+    case $1 in
+        -s) shift; COMMAND="$1"; break;;
+        *) break;
+    esac
+done
+$COMMAND

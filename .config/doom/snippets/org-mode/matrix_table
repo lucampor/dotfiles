@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: matrix table
+# uuid:
+# key: mtab
+# condition: t
+# --
+
+#+ATTR_latex: :mode math :environment pmatrix :math-prefix $1 :math-suffix $2
+| $0 |   |
+|    |   |

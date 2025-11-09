@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: proof
+# uuid: thrpf
+# key: <mf
+# condition: t
+# group: theorem
+# --
+#+begin_proof
+$0
+#+end_proof
