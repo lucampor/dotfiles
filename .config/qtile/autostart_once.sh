@@ -6,3 +6,6 @@ wal -f ~/.config/wal/colorschemes/dark/oceanic-next.json &
 
 # Start picom
 picom --config ~/.config/picom/picom.conf &
+
+# Start emacs server
+emacsclient -c --alternate-editor="" --no-wait -e '(lcp/org-agenda-multiple-views)' &

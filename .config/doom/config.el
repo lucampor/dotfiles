@@ -162,7 +162,7 @@ to if called with ARG, or any prefix argument."
   (org-roam-directory (concat org-directory "roam/"))
   (org-roam-dailies-directory (concat org-roam-directory "diary/"))
   (org-roam-node-display-template
-        (concat "${title:70}" (propertize "${tags:30}" 'face 'org-tag) "(" (propertize "${dir}" 'face 'org-tag) ") "))
+        (concat (propertize "${backlinkscount} " 'face 'org-tag) "${title:70}" (propertize "${tags:30}" 'face 'org-tag) "(" (propertize "${dir}" 'face 'org-tag) ")"))
   (org-roam-dailies-capture-templates
    '(
 
@@ -199,27 +199,18 @@ to if called with ARG, or any prefix argument."
 
 (cl-defmethod org-roam-node-dir ((node org-roam-node))
   "Return the TYPE of NODE."
-  (let ((dir (file-name-directory
-              (file-relative-name (org-roam-node-file node) org-roam-directory))))
-   (if dir
-       (directory-file-name dir)
-     "*")))
+  (if-let ((dir (directory-file-name (file-name-directory (file-relative-name (org-roam-node-file node) org-roam-directory)))))
+      (format "%s" dir)
+     "*"))
 
-(cl-defmethod org-roam-node-almanac ((node org-roam-node))
-  "Return the TYPE of NODE."
-  (let ((dir (file-name-directory
-              (file-relative-name (org-roam-node-file node) org-roam-directory))))
-   (if dir
-       (directory-file-name dir)
-     "*")))
-
-(cl-defmethod org-roam-node-definition ((node org-roam-node))
-  "Return the TYPE of NODE."
-  (let ((dir (file-name-directory
-              (file-relative-name (org-roam-node-file node) org-roam-directory))))
-   (if dir
-       (directory-file-name dir)
-     "*")))
+(cl-defmethod org-roam-node-backlinkscount ((node org-roam-node))
+  (let* ((count (caar (org-roam-db-query
+                       [:select (funcall count source)
+                        :from links
+                        :where (= dest $s1)
+                        :and (= type "id")]
+                       (org-roam-node-id node)))))
+    (format "[%d]" count)))
 
 (load! "lisp/lcp-roam")
 
@@ -327,8 +318,8 @@ to if called with ARG, or any prefix argument."
 (setq org-ellipsis " ⮷") ; ⚻ ☡ ⚕ ♅ ⚶
 (setq org-log-into-drawer 't)
 (setq org-todo-keywords
-    '((sequence "TODO" "WAIT" "|" "DONE(o!)" "CANCELED(c@)")
-      (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v)" "[X](x)")
+    '((sequence "TODO(t)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
+      (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v!)" "[X](x!)")
       ;(sequence "HOMEWORK(h)" "EXAM(e)" "LAB(b)" "CHECK(k)" "MEETING(m)" "PLAN(p)" "IDEA(i)" "|") ;"TASK" "DELIVERY(d)" "MEETING(M)" "LANGUAGE(L)" "HEALTH(H)" "|" "FINISHED(F)")
       ;(sequence "IDEA(i)" "MAYBE(y)" "SOMEDAY(m)" "PROJECT(r)" "GOAL(g)" "LEARN(l)" "|" "DONE" "DROPPED(P)") ; Stuck projects
       ;(sequence "CHORE(R)" "PLAN(p)" "TRIP(T)" "EVENT(E)" "|" "DONE" "MISSED(S)"))
@@ -417,6 +408,8 @@ to if called with ARG, or any prefix argument."
 ;;                       (:endgrouptag)
 ;;                       ))
 
+(defvar lcp/org-projects-dir (concat org-directory "projects/"))
+
 (use-package! org-agenda
   :custom
       (org-agenda-start-on-weekday t)
@@ -428,7 +421,7 @@ to if called with ARG, or any prefix argument."
       (org-tags-exclude-from-inheritance '("main"))
       (org-agenda-hide-tags-regexp "\\(objective\\|main\\)")
       (org-agenda-include-diary nil)
-      (org-agenda-files (list "journal.org" org-journal-dir org-roam-dailies-directory))
+      (org-agenda-files (list "journal.org" org-journal-dir org-roam-dailies-directory lcp/org-projects-dir))
       (org-agenda-time-grid
         '((daily today require-timed remove-match)
           (700 900 1100 1300 1500 1700 1900 2300)
@@ -456,7 +449,6 @@ to if called with ARG, or any prefix argument."
                                      (search time-up deadline-up scheduled-up ts-up habit-down)))
       )
 (org-super-agenda-mode)
-
 
 (defun lcp/org-download-name-screenshot (&optional basename)
     (list
@@ -524,18 +516,29 @@ to if called with ARG, or any prefix argument."
 (defvar lcp/category-names
       (mapcar #'car org-agenda-category-icon-alist))
 
+(org-super-agenda--def-auto-group cat "their org-category property"
+  :key-form (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
+              (org-get-category))
+  :header-form key);;(upcase key))
+
 (setq org-agenda-custom-commands
-      '(("c" "Cosas que hacer"
-         ((agenda ""
+      '(("p" "Proyectos"
+         ((agenda "STYLE=\"habit\""
                   ((org-habit-show-all-today 't)
-                   (org-agenda-overriding-header "Routine")
+                   (org-agenda-files (list lcp/org-projects-dir))
+                   (org-agenda-overriding-header "")
+                   (org-super-agenda-groups
+                    '((:name ""
+                       :auto-cat)
+                      (:discard (:tag "task"))))
                    (org-agenda-sorting-strategy
                     '(priority-down todo-state-up effort-up category-keep))))
-          (tags-todo "-STYLE=\"habit\""
-                     ((org-agenda-overriding-header "Objectives")
+          (alltodo ""
+                     ((org-agenda-overriding-header "Things to do")
+                      (org-agenda-files (list lcp/org-projects-dir))
                       (org-super-agenda-groups
-                       '((:name "Monthly objectives"
-                          :tag "month")
+                       '((:name ""
+                          :auto-cat)
                          (:discard (:tag "task"))
                          ))))
           (tags-todo "-STYLE=\"habit\"+task"
@@ -596,11 +599,11 @@ to if called with ARG, or any prefix argument."
                          :transformer (--> it
                             (propertize it 'face '(:foreground "navajo white")))
                          :deadline future)
-                        (:name "Projects"
-                         :order 12
-                         :transformer (--> it
-                            (propertize it 'face '(:foreground "navajo white")))
-                         :tag "project")
+                        ;; (:name "Projects"
+                        ;;  :order 12
+                        ;;  :transformer (--> it
+                        ;;     (propertize it 'face '(:foreground "navajo white")))
+                        ;;  :tag "project")
                         ))
                       ))
           (agenda "" ((org-agenda-span 13)
@@ -695,14 +698,10 @@ to if called with ARG, or any prefix argument."
 (defun lcp/org-agenda-multiple-views (&optional arg arg2 arg3)
   (interactive "p")
   (setq lcp/pre-agenda-frame-configuration (current-frame-configuration))
-  (org-agenda arg2 "i")
+  (org-agenda arg2 "m")
   (org-agenda-redo)
   (split-window-right)
   (org-agenda arg "n")
-  (org-agenda-redo)
-  (other-window 1)
-  (split-window-right)
-  (org-agenda arg3 "o")
   (org-agenda-redo)
   ;(split-window-below)
   )
@@ -815,7 +814,6 @@ buffer's text scale."
           "\\documentclass[11pt, a4paper, parskip=5em, parindent=0em]{article}
 [DEFAULT-PACKAGES]
 \\usepackage{tikz}
-\\usepackage{forest}
 \\usepackage{algorithm}
 \\usepackage{algpseudocode}
 

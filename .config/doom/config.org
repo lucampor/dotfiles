@@ -228,7 +228,7 @@ Later, if I see I could use it in more places, I'll make it so that the list cha
   (org-roam-directory (concat org-directory "roam/"))
   (org-roam-dailies-directory (concat org-roam-directory "diary/"))
   (org-roam-node-display-template
-        (concat "${title:70}" (propertize "${tags:30}" 'face 'org-tag) "(" (propertize "${dir}" 'face 'org-tag) ") "))
+        (concat (propertize "${backlinkscount} " 'face 'org-tag) "${title:70}" (propertize "${tags:30}" 'face 'org-tag) "(" (propertize "${dir}" 'face 'org-tag) ")"))
   (org-roam-dailies-capture-templates
    '(
 
@@ -275,31 +275,22 @@ Later, if I see I could use it in more places, I'll make it so that the list cha
 #+begin_src elisp
 (cl-defmethod org-roam-node-dir ((node org-roam-node))
   "Return the TYPE of NODE."
-  (let ((dir (file-name-directory
-              (file-relative-name (org-roam-node-file node) org-roam-directory))))
-   (if dir
-       (directory-file-name dir)
-     "*")))
+  (if-let ((dir (directory-file-name (file-name-directory (file-relative-name (org-roam-node-file node) org-roam-directory)))))
+      (format "%s" dir)
+     "*"))
 
-(cl-defmethod org-roam-node-almanac ((node org-roam-node))
-  "Return the TYPE of NODE."
-  (let ((dir (file-name-directory
-              (file-relative-name (org-roam-node-file node) org-roam-directory))))
-   (if dir
-       (directory-file-name dir)
-     "*")))
-
-(cl-defmethod org-roam-node-definition ((node org-roam-node))
-  "Return the TYPE of NODE."
-  (let ((dir (file-name-directory
-              (file-relative-name (org-roam-node-file node) org-roam-directory))))
-   (if dir
-       (directory-file-name dir)
-     "*")))
+(cl-defmethod org-roam-node-backlinkscount ((node org-roam-node))
+  (let* ((count (caar (org-roam-db-query
+                       [:select (funcall count source)
+                        :from links
+                        :where (= dest $s1)
+                        :and (= type "id")]
+                       (org-roam-node-id node)))))
+    (format "[%d]" count)))
 #+end_src
 
 #+RESULTS:
-: org-roam-node-definition
+: org-roam-node-backlinkscount
 #+begin_src elisp
 (load! "lisp/lcp-roam")
 #+end_src
@@ -422,8 +413,8 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
 (setq org-ellipsis " ⮷") ; ⚻ ☡ ⚕ ♅ ⚶
 (setq org-log-into-drawer 't)
 (setq org-todo-keywords
-    '((sequence "TODO" "WAIT" "|" "DONE(o!)" "CANCELED(c@)")
-      (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v)" "[X](x)")
+    '((sequence "TODO(t)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
+      (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v!)" "[X](x!)")
       ;(sequence "HOMEWORK(h)" "EXAM(e)" "LAB(b)" "CHECK(k)" "MEETING(m)" "PLAN(p)" "IDEA(i)" "|") ;"TASK" "DELIVERY(d)" "MEETING(M)" "LANGUAGE(L)" "HEALTH(H)" "|" "FINISHED(F)")
       ;(sequence "IDEA(i)" "MAYBE(y)" "SOMEDAY(m)" "PROJECT(r)" "GOAL(g)" "LEARN(l)" "|" "DONE" "DROPPED(P)") ; Stuck projects
       ;(sequence "CHORE(R)" "PLAN(p)" "TRIP(T)" "EVENT(E)" "|" "DONE" "MISSED(S)"))
@@ -471,6 +462,13 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
       ;; ("MISSED" . (:foreground "#FF3030" :weight bold))
       ))
 #+end_src
+
+#+RESULTS:
+| TODO     | :foreground | maroon  | :weight | bold |
+| WAIT     | :foreground | #FDFF1F | :weight | bold |
+| NEXT     | :foreground | #EE7621 | :weight | bold |
+| DONE     | :foreground | #1E90FF | :weight | bold |
+| CANCELED | :foreground | #FF3030 | :weight | bold |
 
 #+begin_src elisp
 (setq org-priority-lowest 70)
@@ -522,7 +520,10 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
 #+end_src
 
 ** org-agenda
+*** General 
 #+begin_src elisp
+(defvar lcp/org-projects-dir (concat org-directory "projects/"))
+
 (use-package! org-agenda
   :custom
       (org-agenda-start-on-weekday t)
@@ -534,7 +535,7 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
       (org-tags-exclude-from-inheritance '("main"))
       (org-agenda-hide-tags-regexp "\\(objective\\|main\\)")
       (org-agenda-include-diary nil)
-      (org-agenda-files (list "journal.org" org-journal-dir org-roam-dailies-directory))
+      (org-agenda-files (list "journal.org" org-journal-dir org-roam-dailies-directory lcp/org-projects-dir))
       (org-agenda-time-grid
         '((daily today require-timed remove-match)
           (700 900 1100 1300 1500 1700 1900 2300)
@@ -562,7 +563,6 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
                                      (search time-up deadline-up scheduled-up ts-up habit-down)))
       )
 (org-super-agenda-mode)
-
 
 (defun lcp/org-download-name-screenshot (&optional basename)
     (list
@@ -645,18 +645,29 @@ Will change depending on my objectives
 
 *** [[https://orgmode.org/worg/org-tutorials/org-custom-agenda-commands.html][Custom commands]]
 #+begin_src elisp
+(org-super-agenda--def-auto-group cat "their org-category property"
+  :key-form (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
+              (org-get-category))
+  :header-form key);;(upcase key))
+
 (setq org-agenda-custom-commands
-      '(("c" "Cosas que hacer"
-         ((agenda ""
+      '(("p" "Proyectos"
+         ((agenda "STYLE=\"habit\""
                   ((org-habit-show-all-today 't)
-                   (org-agenda-overriding-header "Routine")
+                   (org-agenda-files (list lcp/org-projects-dir))
+                   (org-agenda-overriding-header "")
+                   (org-super-agenda-groups
+                    '((:name ""
+                       :auto-cat)
+                      (:discard (:tag "task"))))
                    (org-agenda-sorting-strategy
                     '(priority-down todo-state-up effort-up category-keep))))
-          (tags-todo "-STYLE=\"habit\""
-                     ((org-agenda-overriding-header "Objectives")
+          (alltodo ""
+                     ((org-agenda-overriding-header "Things to do")
+                      (org-agenda-files (list lcp/org-projects-dir))
                       (org-super-agenda-groups
-                       '((:name "Monthly objectives"
-                          :tag "month")
+                       '((:name ""
+                          :auto-cat)
                          (:discard (:tag "task"))
                          ))))
           (tags-todo "-STYLE=\"habit\"+task"
@@ -717,11 +728,11 @@ Will change depending on my objectives
                          :transformer (--> it
                             (propertize it 'face '(:foreground "navajo white")))
                          :deadline future)
-                        (:name "Projects"
-                         :order 12
-                         :transformer (--> it
-                            (propertize it 'face '(:foreground "navajo white")))
-                         :tag "project")
+                        ;; (:name "Projects"
+                        ;;  :order 12
+                        ;;  :transformer (--> it
+                        ;;     (propertize it 'face '(:foreground "navajo white")))
+                        ;;  :tag "project")
                         ))
                       ))
           (agenda "" ((org-agenda-span 13)
@@ -764,9 +775,9 @@ Will change depending on my objectives
 #+end_src
 
 #+RESULTS:
-| c | Cosas que hacer | ((agenda  ((org-habit-show-all-today 't) (org-agenda-overriding-header Routine) (org-agenda-sorting-strategy '(priority-down todo-state-up effort-up category-keep)))) (tags-todo -STYLE="habit" ((org-agenda-overriding-header Objectives) (org-super-agenda-groups '((:name Monthly objectives :tag month) (:discard (:tag task)))))) (tags-todo -STYLE="habit"+task ((org-agenda-overriding-header Pending tasks))))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | ((org-agenda-span 1) (org-use-tag-inheritance 'nil) (org-agenda-dim-blocked-tasks nil) (org-agenda-remove-tags 't) (org-agenda-todo-ignore-timestamp 'nil) (org-agenda-todo-keyword-format ) (org-agenda-use-time-grid 'nil) (org-agenda-todo-ignore-scheduled 'nil) (org-agenda-start-day 0d) (org-agenda-show-inherited-tags 'nil) (org-agenda-files (directory-files-recursively org-brain-path (rx .org eos)))) |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| n | Journal         | ((agenda  ((org-agenda-overriding-header Previously...) (org-agenda-start-day -3d) (org-agenda-span 3))) (agenda  ((org-agenda-span 1) (org-agenda-use-time-grid 't) (org-agenda-todo-keyword-format ) (org-agenda-deadline-leaders '(Deadline:  %1d days left:  %1d days ago: )) (org-agenda-scheduled-leaders '(Scheduled:  Day %1d: )) (org-agenda-show-future-repeats 't) (org-agenda-todo-ignore-scheduled 'org-agenda-span) (org-agenda-start-day 0d) (org-super-agenda-groups '((:name  :time-grid 't :transformer (--> it (cond ((string-match :daily: it) (propertize it 'face '(:foreground light sky blue))) ((string-match :routine: it) (propertize it 'face '(:foreground pink))) ((string-match (car org-agenda-scheduled-leaders) it) (propertize it 'face '(:foreground aquamarine))) ((string-match (car org-agenda-deadline-leaders) it) (propertize it 'face '(:foreground orchid))) (t (propertize it))) (string-replace :: : it))) (:name Expired :order 8 :transformer (--> it (propertize it 'face '(:foreground orchid))) :deadline today :deadline past) (:name Ongoing tasks :order 10 :transformer (--> it (propertize it 'face '(:foreground aquamarine))) :scheduled today :and (:not (:deadline future) :scheduled past)) (:name Task with a deadline :order 9 :transformer (--> it (propertize it 'face '(:foreground navajo white))) :deadline future) (:name Projects :order 12 :transformer (--> it (propertize it 'face '(:foreground navajo white))) :tag project))))) (agenda  ((org-agenda-span 13) (org-agenda-overriding-header Coming up...) (org-agenda-use-time-grid 'nil) (org-agenda-todo-keyword-format ) (org-agenda-show-future-repeats 't) (org-agenda-start-day +1d)))) | nil                                                                                                                                                                                                                                                                                                                                                                                                                 | (~/org/calendar.ics)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| m | almanac         | alltodo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                     | ((org-agenda-overriding-header Almanac) (org-agenda-dim-blocked-tasks nil) (org-agenda-todo-keyword-format %-1s) (org-agenda-files (list (concat org-journal-dir almanac.org))) (org-agenda-remove-tags 'nil) (org-agenda-show-inherited-tags 'nil) (org-agenda-align-tags-to-column (- 10 (window-text-width))) (org-super-agenda-unmatched-name Miscellaneous) (org-super-agenda-groups '((:name Topics to explore :order 10 :category topic) (:name Recommendations :order 9 :category recommendation) (:name Art :order 15 :category art) (:name Ideas :order 12 :category idea)))) |
+| p | Proyectos | ((agenda STYLE="habit" ((org-habit-show-all-today 't) (org-agenda-files (list lcp/org-projects-dir)) (org-agenda-overriding-header ) (org-super-agenda-groups '((:name  :auto-cat) (:discard (:tag task)))) (org-agenda-sorting-strategy '(priority-down todo-state-up effort-up category-keep)))) (alltodo  ((org-agenda-overriding-header Things to do) (org-agenda-files (list lcp/org-projects-dir)) (org-super-agenda-groups '((:name  :auto-cat) (:discard (:tag task)))))) (tags-todo -STYLE="habit"+task ((org-agenda-overriding-header Pending tasks))))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | ((org-agenda-span 1) (org-use-tag-inheritance 'nil) (org-agenda-dim-blocked-tasks nil) (org-agenda-remove-tags 't) (org-agenda-todo-ignore-timestamp 'nil) (org-agenda-todo-keyword-format ) (org-agenda-use-time-grid 'nil) (org-agenda-todo-ignore-scheduled 'nil) (org-agenda-start-day 0d) (org-agenda-show-inherited-tags 'nil) (org-agenda-files (directory-files-recursively org-brain-path (rx .org eos)))) |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| n | Journal   | ((agenda  ((org-agenda-overriding-header Previously...) (org-agenda-start-day -3d) (org-agenda-span 3))) (agenda  ((org-agenda-span 1) (org-agenda-use-time-grid 't) (org-agenda-todo-keyword-format ) (org-agenda-deadline-leaders '(Deadline:  %1d days left:  %1d days ago: )) (org-agenda-scheduled-leaders '(Scheduled:  Day %1d: )) (org-agenda-show-future-repeats 't) (org-agenda-todo-ignore-scheduled 'org-agenda-span) (org-agenda-start-day 0d) (org-super-agenda-groups '((:name  :time-grid 't :transformer (--> it (cond ((string-match :daily: it) (propertize it 'face '(:foreground light sky blue))) ((string-match :routine: it) (propertize it 'face '(:foreground pink))) ((string-match (car org-agenda-scheduled-leaders) it) (propertize it 'face '(:foreground aquamarine))) ((string-match (car org-agenda-deadline-leaders) it) (propertize it 'face '(:foreground orchid))) (t (propertize it))) (string-replace :: : it))) (:name Expired :order 8 :transformer (--> it (propertize it 'face '(:foreground orchid))) :deadline today :deadline past) (:name Ongoing tasks :order 10 :transformer (--> it (propertize it 'face '(:foreground aquamarine))) :scheduled today :and (:not (:deadline future) :scheduled past)) (:name Task with a deadline :order 9 :transformer (--> it (propertize it 'face '(:foreground navajo white))) :deadline future))))) (agenda  ((org-agenda-span 13) (org-agenda-overriding-header Coming up...) (org-agenda-use-time-grid 'nil) (org-agenda-todo-keyword-format ) (org-agenda-show-future-repeats 't) (org-agenda-start-day +1d)))) | nil                                                                                                                                                                                                                                                                                                                                                                                                                 | (~/org/calendar.ics)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| m | almanac   | alltodo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                     | ((org-agenda-overriding-header Almanac) (org-agenda-dim-blocked-tasks nil) (org-agenda-todo-keyword-format %-1s) (org-agenda-files (list (concat org-journal-dir almanac.org))) (org-agenda-remove-tags 'nil) (org-agenda-show-inherited-tags 'nil) (org-agenda-align-tags-to-column (- 10 (window-text-width))) (org-super-agenda-unmatched-name Miscellaneous) (org-super-agenda-groups '((:name Topics to explore :order 10 :category topic) (:name Recommendations :order 9 :category recommendation) (:name Art :order 15 :category art) (:name Ideas :order 12 :category idea)))) |
 
 *** Change color by tag
 #+begin_src elisp
@@ -830,14 +841,10 @@ Will change depending on my objectives
 (defun lcp/org-agenda-multiple-views (&optional arg arg2 arg3)
   (interactive "p")
   (setq lcp/pre-agenda-frame-configuration (current-frame-configuration))
-  (org-agenda arg2 "i")
+  (org-agenda arg2 "m")
   (org-agenda-redo)
   (split-window-right)
   (org-agenda arg "n")
-  (org-agenda-redo)
-  (other-window 1)
-  (split-window-right)
-  (org-agenda arg3 "o")
   (org-agenda-redo)
   ;(split-window-below)
   )

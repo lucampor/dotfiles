@@ -1,17 +1,3 @@
-    
-#       █████████     ███████    ███████████ █████ █████ ███████████ █████ █████       ██████████
-#      ███░░░░░███  ███░░░░░███ ░█░░░░░░███ ░░███ ░░███ ░█░░░███░░░█░░███ ░░███       ░░███░░░░░█
-#     ███     ░░░  ███     ░░███░     ███░   ░░███ ███  ░   ░███  ░  ░███  ░███        ░███  █ ░ 
-#    ░███         ░███      ░███     ███      ░░█████       ░███     ░███  ░███        ░██████   
-#    ░███         ░███      ░███    ███        ░░███        ░███     ░███  ░███        ░███░░█   
-#    ░░███     ███░░███     ███   ████     █    ░███        ░███     ░███  ░███      █ ░███ ░   █
-#     ░░█████████  ░░░███████░   ███████████    █████       █████    █████ ███████████ ██████████
-#      ░░░░░░░░░     ░░░░░░░    ░░░░░░░░░░░    ░░░░░       ░░░░░    ░░░░░ ░░░░░░░░░░░ ░░░░░░░░░░ 
-#
-#                                                                                    - DARKKAL44
-  
-
-
 from libqtile import bar, layout, widget, hook, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, hook, Screen, KeyChord
 from libqtile.lazy import lazy
@@ -78,7 +64,7 @@ keys = [
     Key([], "XF86AudioNext", lazy.spawn("playerctl next"), desc='playerctl'),
     Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl s 10%+"), desc='brightness UP'),
     Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl s 10%-"), desc='brightness Down'),
-    Key([mod],"e", lazy.spawn("emacsclient -c --alternate-editor="" --no-wait -e \'(org-agenda nil \"n\")\'"), desc='best editor ever'),
+    Key([mod],"e", lazy.spawn("emacsclient -c --alternate-editor="" --no-wait -e \'(lcp/org-agenda-multiple-views)\'"), desc='best editor ever'),
 	#Key([mod], "h", lazy.spawn("roficlip"), desc='clipboard'),
     Key([mod], "s", lazy.spawn("flameshot gui"), desc='Screenshot'),
     Key([mod], "w", lazy.spawn("waterfox"), desc="Kill focused window"),
