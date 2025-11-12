@@ -1,5 +1,5 @@
 :PROPERTIES:
-:header-args: :tangle ~/.config/doom/config.el
+:header-args: :tangle ~/.config/doom/config.el :results none
 :END:
 #+title: Literate Config
 #+startup: fold
@@ -33,9 +33,6 @@ No element cache. Otherwise instant crash when parsing latex
 
 (setq display-line-numbers-type 'visual)
 #+end_src
-
-#+RESULTS:
-: visual
 
 ** Global functions
 #begin_src elisp
@@ -80,8 +77,6 @@ No element cache. Otherwise instant crash when parsing latex
 (map! :map outshine-mode-map "TAB" #'outshine-cycle)
 #+end_src
 
-#+RESULTS:
-
 * UI
 #+begin_src elisp
 (set-frame-parameter nil 'alpha-background 95) ; For current frame
@@ -123,7 +118,6 @@ Later, if I see I could use it in more places, I'll make it so that the list cha
 (package! org-fragtog
   :recipe (:host github :repo "io12/org-fragtog"))
 (package! org-roam-bibtex)
-(package! org-chef)
 (package! org-download)
 (package! org-super-agenda)
 #+end_src
@@ -166,8 +160,6 @@ Later, if I see I could use it in more places, I'll make it so that the list cha
       ))
 #+end_src
 
-#+RESULTS:
-
 ** org-journal
 #+begin_src elisp
 (setq calendar-week-start-day 1) ; Begin week on Monday
@@ -199,23 +191,7 @@ Later, if I see I could use it in more places, I'll make it so that the list cha
   (org-journal-file-header "#+TITLE: %B %Y Monthly Journal\n#+STARTUP: folded\n")) ;'org-journal-file-header-func))
 (setq diary-file (concat org-journal-dir "dates.org"))
 #+end_src
-
-#+begin_src elisp
-;; (defun jethro/tag-new-node-as-draft ()
-;;   (org-roam-tag-add '("__draft__")))
-;; (add-hook 'org-roam-capture-new-node-hook #'jethro/tag-new-node-as-draft)
-#+end_src
 ** org-roam
-#+begin_src elisp
-;; (defmacro lcp/org-roam-template (letter name &optional class)
-;;   `(,letter ,name plain "%?" :target
-
-;;         (file+head ,(concat ,name "/${slug}.org" "#+title: ${title}\n" ,(if ,class (concat "#+latex_class: " ,class )) "\n#+startup: latexpreview"));#+filetags: :__draft__:\n")
-;;           :jump-to-capture t
-;;           :unnarrowed t))
-;; (lcp/org-roam-template "ca" "artificial intelligence" "compsci")
-#+end_src
-
 #+begin_src elisp
 (use-package! org-roam
   :ensure t
@@ -253,9 +229,6 @@ Later, if I see I could use it in more places, I'll make it so that the list cha
   )
 #+end_src
 
-#+RESULTS:
-: completion-at-point
-
 #+begin_src elisp
 (defun  lcp/org-roam-add-almanac ()
   (interactive)
@@ -268,9 +241,6 @@ Later, if I see I could use it in more places, I'll make it so that the list cha
       (goto-char (org-roam-node-point node))
       (org-roam-property-add "ALMANAC" (concat "" almanac "")))))
 #+end_src
-
-#+RESULTS:
-: lcp/org-roam-add-almanac
 
 #+begin_src elisp
 (cl-defmethod org-roam-node-dir ((node org-roam-node))
@@ -288,15 +258,9 @@ Later, if I see I could use it in more places, I'll make it so that the list cha
                        (org-roam-node-id node)))))
     (format "[%d]" count)))
 #+end_src
-
-#+RESULTS:
-: org-roam-node-backlinkscount
 #+begin_src elisp
 (load! "lisp/lcp-roam")
 #+end_src
-
-#+RESULTS:
-: t
 
 This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e1713][source]]) is really useful to exclude the nodes with the ":drill:" tag necessary for org-drill to work.
 #+begin_src elisp
@@ -317,89 +281,8 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
     (file+head "${slug}.org" "#+title: ${title}\n#+startup: latexpreview\n");#+filetags: :__draft__:\n")
     :jump-to-capture t
     :unnarrowed t)
-    ;; ("m" "math" plain "%?" :target
-    ;; (file+head "math/${slug}.org" "#+title: ${title}\n#+latex_class: math\n#+startup: latexpreview");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("c" "compsci" plain "%?" :target
-    ;; (file+head "compsci/${slug}.org" "#+title: ${title}\n#+latex_class: compsci\n#+startup: latexpreview");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-
-    ;; ("e" "essay") ; "miscellaneous with purpose"
-    ;; ("ef" "fleeting" plain "%?" :target
-    ;; (file+head "essay/fleeting/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("ez" "zettelkasten" plain "%?" :target
-    ;; (file+head "essay/zettelkasten/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-
-    ;; ("t" "miscellaneous" plain "%?" :target ; "didn't want to call it trivia"
-    ;; (file+head "miscellaneous/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-
-    ;; ("s" "social science" plain "%?" :target
-    ;; (file+head "social science/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-
-    ;; ("i" "index and mind map" plain "%?" :target
-    ;;  (file+head "index/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;;  :jump-to-capture t
-    ;;  :unnarrowed t)
-
-    ;; ("h" "health" plain "%?" :target
-    ;;  (file+head "health/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;;  :jump-to-capture t
-    ;;  :unnarrowed t)
-
-    ;; ("a" "art")
-    ;; ("aa" "anime & manga" plain "%?" :target
-    ;; (file+head "art/anime/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("al" "literature" plain "%?" :target
-    ;; (file+head "art/literature/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("ap" "painting & fine arts" plain "%?" :target
-    ;; (file+head "art/fine arts/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("ac" "cinematography" plain "%?" :target
-    ;; (file+head "art/cinematography/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("am" "music" plain "%?" :target
-    ;; (file+head "art/music/${slug}.org" "#+title: ${title}\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-
-    ;; ("l" "language")
-    ;; ("lr" "русский" plain "%?" :target
-    ;; (file+head "language/russkii/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("lt" "türkçe" plain "%?" :target
-    ;; (file+head "language/türkçe/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("lf" "français" plain "%?" :target
-    ;; (file+head "language/français/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("ld" "deutsch" plain "%?" :target
-    ;; (file+head "language/deutsch/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
     ))
 #+end_src
-
-#+RESULTS:
-| r | roam | plain | %? | :target | (file+head ${slug}.org #+title: ${title} |
 
 ** org-brain
 #+begin_src elisp
@@ -414,11 +297,7 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
 (setq org-log-into-drawer 't)
 (setq org-todo-keywords
     '((sequence "TODO(t)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
-      (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v!)" "[X](x!)")
-      ;(sequence "HOMEWORK(h)" "EXAM(e)" "LAB(b)" "CHECK(k)" "MEETING(m)" "PLAN(p)" "IDEA(i)" "|") ;"TASK" "DELIVERY(d)" "MEETING(M)" "LANGUAGE(L)" "HEALTH(H)" "|" "FINISHED(F)")
-      ;(sequence "IDEA(i)" "MAYBE(y)" "SOMEDAY(m)" "PROJECT(r)" "GOAL(g)" "LEARN(l)" "|" "DONE" "DROPPED(P)") ; Stuck projects
-      ;(sequence "CHORE(R)" "PLAN(p)" "TRIP(T)" "EVENT(E)" "|" "DONE" "MISSED(S)"))
-      ))
+      (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v!)" "[X](x!)")))
 
 (setq org-todo-keyword-faces
     '(("TODO" . (:foreground "maroon" :weight bold)) ;
@@ -426,49 +305,16 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
       ("NEXT" . (:foreground "#EE7621" :weight bold))
       ("DONE" . (:foreground "#1E90FF" :weight bold))
       ("CANCELED" . (:foreground "#FF3030" :weight bold))
-
-      ;; ("DAILY" . (:foreground "#FF7F24" :weight bold))
-
-      ;; ("EXAM" . (:foreground "#EE7942" :weight bold))
-      ;; ("LAB" . (:foreground "thistle" :weight bold))
-      ;; ("TASK" . (:foreground "maroon" :weight bold))
-      ;; ("DELIVERY" . (:foreground "#FFF68F" :weight bold))
-      ;; ("LANGUAGE" . (:foreground "#98FB98" :weight bold))
-      ;; ("HEALTH" . (:foreground "#138414" :weight bold))
-      ;; ("MEETING" . (:foreground "#EED5D2" :weight bold))
-      ;; ("FINISHED" . (:foreground "#1E90FF" :weight bold))
-
-      ;; ("IDEA" . (:foreground "DeepSkyBlue1" :weight bold))
-      ;; ("MAYBE" . (:foreground "#610E5D" :weight bold))
-      ;; ("CHECK" . (:foreground "aquamarine" :weight bold))
-      ;; ("SOMEDAY" . (:foreground "#EED5D2" :weight bold))
-      ;; ("PROJECT" . (:foreground "#4EEE94" :weight bold))
-      ;; ("GOAL". (:foregoround "#FF3E96" :weight bold))
-      ;; ("LEARN" . (:foreground "#8EE5EE" :weight bold))
-      ;; ("DROPPED" . (:foreground "#FF3030" :weight bold))
-
-      ;; ("[ ]" . (:foreground "SteelBlue" :weight bold))
-      ;; ("[-]" . (:foreground "#EEC591" :weight bold))
-      ;; ("[#]" . (:foreground "#178595" :weight bold))
-      ;; ("[?]" . (:foreground "#FE8591" :weight bold))
-      ;; ("[!]" . (:foreground "#9E3511" :weight bold))
-      ;; ("[V]" . (:foreground "LimeGreen" :weight bold))
-      ;; ("[X]" . (:foreground "IndianRed" :weight bold))
-
-      ;; ("CHORE" . (:foreground "chocolate" :weight bold))
-      ;; ("PLAN" . (:foreground "deep pink" :weight bold))
-      ;; ("TRIP" . (:foreground "LightSteelBlue2" :weight bold))
-      ;; ("EVENT" . (:foreground "#B3EE3A" :weight bold))
-      ;; ("MISSED" . (:foreground "#FF3030" :weight bold))
+      
+      ("[ ]" . (:foreground "SteelBlue" :weight bold))
+      ("[-]" . (:foreground "#EEC591" :weight bold))
+      ("[#]" . (:foreground "#178595" :weight bold))
+      ("[?]" . (:foreground "#FE8591" :weight bold))
+      ("[!]" . (:foreground "#9E3511" :weight bold))
+      ("[V]" . (:foreground "LimeGreen" :weight bold))
+      ("[X]" . (:foreground "IndianRed" :weight bold))
       ))
 #+end_src
-
-#+RESULTS:
-| TODO     | :foreground | maroon  | :weight | bold |
-| WAIT     | :foreground | #FDFF1F | :weight | bold |
-| NEXT     | :foreground | #EE7621 | :weight | bold |
-| DONE     | :foreground | #1E90FF | :weight | bold |
-| CANCELED | :foreground | #FF3030 | :weight | bold |
 
 #+begin_src elisp
 (setq org-priority-lowest 70)
@@ -487,38 +333,6 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
                                           "__book__" "__index__" "__subject__" "__media__" "__conference__" ;; Tags used in org-roam
                                           ))
 #+end_src
-
-*** [[https://www.gnu.org/software/emacs/manual/html_node/org/Tag-Hierarchy.html][Tag Hierarchy]]
-#+begin_src elisp
-;; (setq org-tag-alist '(
-;;                       ;; Related to University
-;;                       ("#uni" . ?u)
-;;                       ("#eeuu" . ?u)
-;;                       (:startgrouptag)
-;;                       ("#neu" . ?n)
-;;                         (:grouptags)
-;;                         ("CS4830")("CS3700")("DS4400")("IS4300")
-;;                       (:endgrouptag)
-;;                       ;; Hobbies
-;;                       (:startgrouptag)
-;;                       ("#hobbie" . nil)
-;;                         (:grouptags)
-;;                         ("deutsch")("russkii");("chinese")
-;;                         (:grouptags)
-;;                         ("aeronu")("compsci")("gamedev")
-;;                         (:grouptags)
-;;                         ("transpirenaica")("archery");("flute")("chess")
-;;                       (:endgrouptag)
-;;                       ;; Tasks
-;;                       (:startgrouptag)
-;;                       ("#task" . nil)
-;;                         (:grouptags)
-;;                         ("buy")("clean")("cook")
-;;                       (:endgrouptag)
-;;                       ))
-
-#+end_src
-
 ** org-agenda
 *** General 
 #+begin_src elisp
@@ -589,8 +403,6 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
 (advice-add 'org-download-clipboard :filter-args #'lcp/org-download-name-screenshot)
 #+end_src
 
-#+RESULTS:
-
 Now the tags appear in a better spot:
 #+begin_src elisp
 (add-hook 'org-agenda-mode-hook #'(lambda () (setq org-agenda-align-tags-to-column (- 20))));(- 10 (window-text-width))))))
@@ -601,47 +413,9 @@ Will change depending on my objectives
 #+begin_src elisp
 (defvar lcp--icons-dir (concat doom-user-dir "icons/"))
 
-(setq org-agenda-category-icon-alist
-      '(
-        ("addiction" "~/.config/doom/icons/gemini.svg" nil nil :ascent center :height 25);:mask heuristic)
-;-------------------------   HOBBIES   -------------------------;
-        ("hiking" "~/.config/doom/icons/hiking.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("mathematics" "~/.config/doom/icons/mathematics.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("gamedev" "~/.config/doom/icons/gamedev.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("book" "~/.config/doom/icons/book.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("running" "~/.config/doom/icons/running.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("flute" "~/.config/doom/icons/flute.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("sewing" "~/.config/doom/icons/sewing.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("cook" "~/.config/doom/icons/cook.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("culture" "~/.config/doom/icons/culture.svg" nil nil :ascent center :height 25);:mask heuristic)
-;-------------------------   LANGUAGES   -------------------------;
-        ("russkii" "~/.config/doom/icons/russkii.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("chinese" "~/.config/doom/icons/chinese.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("turkish" "~/.config/doom/icons/turkish.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ;("arab" nil nil :ascent center :height 25);:mask heuristic)
-        ;("suomi" nil nil :ascent center :height 25);:mask heuristic)
-;-------------------------  PROGRAMMING LANGUAGES   -------------------------;
-        ("haskell" "~/.config/doom/icons/haskell.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("rust" "~/.config/doom/icons/rust.svg" nil nil :ascent center :height 25);:mask heuristic)
-;-------------------------   CAREER   -------------------------;
-        ("EEUU" "~/.config/doom/icons/eeuu.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("vulcanus" "~/.config/doom/icons/japan.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ;("erasmus" nil nil :ascent center :height 25);:mask heuristic)
-        ("compsci" "~/.config/doom/icons/compsci.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("deutschland" "~/.config/doom/icons/deutschland.svg" nil nil :ascent center :height 25);:mask heuristic)
-;-------------------------   MISC   -------------------------;
-        ("university" "~/.config/doom/icons/university.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("health" "~/.config/doom/icons/health.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("chore" "~/.config/doom/icons/chore.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("clean" "~/.config/doom/icons/clean.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ))
-
 (defvar lcp/category-names
       (mapcar #'car org-agenda-category-icon-alist))
 #+end_src
-
-#+RESULTS:
-: lcp/category-names
 
 *** [[https://orgmode.org/worg/org-tutorials/org-custom-agenda-commands.html][Custom commands]]
 #+begin_src elisp
@@ -651,39 +425,7 @@ Will change depending on my objectives
   :header-form key);;(upcase key))
 
 (setq org-agenda-custom-commands
-      '(("p" "Proyectos"
-         ((agenda "STYLE=\"habit\""
-                  ((org-habit-show-all-today 't)
-                   (org-agenda-files (list lcp/org-projects-dir))
-                   (org-agenda-overriding-header "")
-                   (org-super-agenda-groups
-                    '((:name ""
-                       :auto-cat)
-                      (:discard (:tag "task"))))
-                   (org-agenda-sorting-strategy
-                    '(priority-down todo-state-up effort-up category-keep))))
-          (alltodo ""
-                     ((org-agenda-overriding-header "Things to do")
-                      (org-agenda-files (list lcp/org-projects-dir))
-                      (org-super-agenda-groups
-                       '((:name ""
-                          :auto-cat)
-                         (:discard (:tag "task"))
-                         ))))
-          (tags-todo "-STYLE=\"habit\"+task"
-                     ((org-agenda-overriding-header "Pending tasks"))))
-         ((org-agenda-span 1)
-          (org-use-tag-inheritance 'nil)
-          (org-agenda-dim-blocked-tasks nil)
-          (org-agenda-remove-tags 't)
-          (org-agenda-todo-ignore-timestamp 'nil)
-          (org-agenda-todo-keyword-format "")
-                      (org-agenda-use-time-grid 'nil)
-          (org-agenda-todo-ignore-scheduled 'nil)
-          (org-agenda-start-day "0d")
-          (org-agenda-show-inherited-tags 'nil)
-          (org-agenda-files (directory-files-recursively org-brain-path (rx ".org" eos)))))
-       ("n" "Journal"
+      '(("n" "Journal"
          (
           (agenda "" ((org-agenda-overriding-header "Previously...")
                       (org-agenda-start-day "-3d")
@@ -774,55 +516,12 @@ Will change depending on my objectives
        ))
 #+end_src
 
-#+RESULTS:
-| p | Proyectos | ((agenda STYLE="habit" ((org-habit-show-all-today 't) (org-agenda-files (list lcp/org-projects-dir)) (org-agenda-overriding-header ) (org-super-agenda-groups '((:name  :auto-cat) (:discard (:tag task)))) (org-agenda-sorting-strategy '(priority-down todo-state-up effort-up category-keep)))) (alltodo  ((org-agenda-overriding-header Things to do) (org-agenda-files (list lcp/org-projects-dir)) (org-super-agenda-groups '((:name  :auto-cat) (:discard (:tag task)))))) (tags-todo -STYLE="habit"+task ((org-agenda-overriding-header Pending tasks))))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | ((org-agenda-span 1) (org-use-tag-inheritance 'nil) (org-agenda-dim-blocked-tasks nil) (org-agenda-remove-tags 't) (org-agenda-todo-ignore-timestamp 'nil) (org-agenda-todo-keyword-format ) (org-agenda-use-time-grid 'nil) (org-agenda-todo-ignore-scheduled 'nil) (org-agenda-start-day 0d) (org-agenda-show-inherited-tags 'nil) (org-agenda-files (directory-files-recursively org-brain-path (rx .org eos)))) |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| n | Journal   | ((agenda  ((org-agenda-overriding-header Previously...) (org-agenda-start-day -3d) (org-agenda-span 3))) (agenda  ((org-agenda-span 1) (org-agenda-use-time-grid 't) (org-agenda-todo-keyword-format ) (org-agenda-deadline-leaders '(Deadline:  %1d days left:  %1d days ago: )) (org-agenda-scheduled-leaders '(Scheduled:  Day %1d: )) (org-agenda-show-future-repeats 't) (org-agenda-todo-ignore-scheduled 'org-agenda-span) (org-agenda-start-day 0d) (org-super-agenda-groups '((:name  :time-grid 't :transformer (--> it (cond ((string-match :daily: it) (propertize it 'face '(:foreground light sky blue))) ((string-match :routine: it) (propertize it 'face '(:foreground pink))) ((string-match (car org-agenda-scheduled-leaders) it) (propertize it 'face '(:foreground aquamarine))) ((string-match (car org-agenda-deadline-leaders) it) (propertize it 'face '(:foreground orchid))) (t (propertize it))) (string-replace :: : it))) (:name Expired :order 8 :transformer (--> it (propertize it 'face '(:foreground orchid))) :deadline today :deadline past) (:name Ongoing tasks :order 10 :transformer (--> it (propertize it 'face '(:foreground aquamarine))) :scheduled today :and (:not (:deadline future) :scheduled past)) (:name Task with a deadline :order 9 :transformer (--> it (propertize it 'face '(:foreground navajo white))) :deadline future))))) (agenda  ((org-agenda-span 13) (org-agenda-overriding-header Coming up...) (org-agenda-use-time-grid 'nil) (org-agenda-todo-keyword-format ) (org-agenda-show-future-repeats 't) (org-agenda-start-day +1d)))) | nil                                                                                                                                                                                                                                                                                                                                                                                                                 | (~/org/calendar.ics)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| m | almanac   | alltodo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                     | ((org-agenda-overriding-header Almanac) (org-agenda-dim-blocked-tasks nil) (org-agenda-todo-keyword-format %-1s) (org-agenda-files (list (concat org-journal-dir almanac.org))) (org-agenda-remove-tags 'nil) (org-agenda-show-inherited-tags 'nil) (org-agenda-align-tags-to-column (- 10 (window-text-width))) (org-super-agenda-unmatched-name Miscellaneous) (org-super-agenda-groups '((:name Topics to explore :order 10 :category topic) (:name Recommendations :order 9 :category recommendation) (:name Art :order 15 :category art) (:name Ideas :order 12 :category idea)))) |
-
 *** Change color by tag
 #+begin_src elisp
 (set-face-attribute 'org-agenda-dimmed-todo-face nil
                     :weight 'ultra-bold
                     :inverse-video 't
                     :slant 'reverse-italic)
-;(defvar lcp--tag-color-cons-alist)
-;; (defun lcp--org-agenda-tag-color ()
-
-;;   "This function changes the entry's foreground color depending on the tags depending of what is specified"
-;;   )
-;; (add-hook 'org-mode-hook
-;;           (lambda ()
-;;             (font-lock-add-keywords
-;;              'org-mode
-             ;; '(
-             ;;   ("^.*:#deutsch:.*$" 0 '(:foreground "#FF6347") t)
-             ;;   ("^.*:#eeuu:.*$" 0 '(:foreground "#5CACEE") t)
-             ;;   ("^.*:#uni:.*$" 0 '(:foreground "#FF82AB") t)
-             ;;   ("^.*:#health:.*$" 0 '(:foreground "#54FF9F") t)
-             ;;   ;("^.*:#hiking:.*$" 0 '(:foreground "#FF8247") t)
-             ;;   ("^.*:#compsci:.*$" 0 '(:foreground "#FF83FA") t)
-             ;;   ("^.*:#russki:.*$" 0 '(:foreground "#97FFFF") t)
-             ;;   ("^.*:#gamedev:.*$" 0 '(:foreground "#FFE4E1") t)
-             ;;   )
-;)))
-
-;#'lcp--org-agenda-tag-color)
-#+end_src
-
-#+RESULTS:
-
-#+begin_src elisp
-;; (setq org-tag-faces
-;; '(
-;;   ("#deutsch" . '(:foreground "#FF6347"))
-;;   ("#eeuu" . '(:foreground "#5CACEE"))
-;;   ("#uni" . '(:foreground "#FF82AB"))
-;;   ("#health" . '(:foreground "#54FF9F"))
-;;   ;("#hiking" . '(:foreground "#FF8247"))
-;;   ("#compsci" . '(:foreground "#FF83FA"))
-;;   ("#russki" . '(:foreground "#97FFFF"))
-;;   ("#gamedev" . '(:foreground "#FFE4E1"))
-;;   ))
 #+end_src
 *** Multiple agendas at the same time
 #+begin_src elisp
@@ -920,15 +619,6 @@ Will change depending on my objectives
           :time-prompt t)))
 #+end_src
 
-#+RESULTS:
-
-** org-chef
-#+begin_src elisp
-(use-package! org-chef)
-
-;; (defun lcp/org-chef-add-to-roam
-;;     )
-#+end_src
 ** org-fragtog
 #+begin_src elisp
 (use-package! org-fragtog
@@ -967,9 +657,6 @@ buffer's text scale."
     :config
     (ox-extras-activate '(latex-header-blocks ignore-headlines))))
 #+end_src
-
-#+RESULTS:
-: t
 
 *** Custom classes
 #+begin_src elisp
@@ -1022,8 +709,6 @@ buffer's text scale."
           ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
          ))
 #+end_src
-
-#+RESULTS:
 
 ** org-transclusion
 #+begin_src elisp
@@ -1232,9 +917,6 @@ https://www.overleaf.com/learn/latex/Using_colors_in_LaTeX
   )
 #+end_src
 
-#+RESULTS:
-| er/add-org-mode-expansions | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | laas-mode | org-fragtog-mode | org-ref-org-menu | +lookup--init-org-mode-handlers-h | (closure (t) (&rest _) (add-hook 'before-save-hook 'org-encrypt-entries nil t)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | doom-disable-show-paren-mode-h | doom-disable-show-trailing-whitespace-h | +org-make-last-point-visible-h | evil-org-mode | toc-org-enable | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | embrace-org-mode-hook |
-
 * LSP
 #+begin_src elisp :tangle ~/.config/doom/packages.el
 (package! lsp-pyright
@@ -1266,9 +948,6 @@ https://www.overleaf.com/learn/latex/Using_colors_in_LaTeX
 ;(setq lsp-beancount-journal-file "cargo/bin/beancount-language-server")
 #+end_src
 
-#+RESULTS:
-: t
-
 #+begin_src elisp
 (setq treesit-language-source-alist
    '((bash "https://github.com/tree-sitter/tree-sitter-bash")
@@ -1289,24 +968,6 @@ https://www.overleaf.com/learn/latex/Using_colors_in_LaTeX
      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 #+end_src
 
-#+RESULTS:
-| bash       | https://github.com/tree-sitter/tree-sitter-bash       |        |                |
-| cmake      | https://github.com/uyha/tree-sitter-cmake             |        |                |
-| css        | https://github.com/tree-sitter/tree-sitter-css        |        |                |
-| elisp      | https://github.com/Wilfred/tree-sitter-elisp          |        |                |
-| elixir     | https://github.com/elixir-lang/tree-sitter-elixir     |        |                |
-| go         | https://github.com/tree-sitter/tree-sitter-go         |        |                |
-| html       | https://github.com/tree-sitter/tree-sitter-html       |        |                |
-| javascript | https://github.com/tree-sitter/tree-sitter-javascript | master | src            |
-| json       | https://github.com/tree-sitter/tree-sitter-json       |        |                |
-| make       | https://github.com/alemuller/tree-sitter-make         |        |                |
-| markdown   | https://github.com/ikatyang/tree-sitter-markdown      |        |                |
-| python     | https://github.com/tree-sitter/tree-sitter-python     |        |                |
-| toml       | https://github.com/tree-sitter/tree-sitter-toml       |        |                |
-| tsx        | https://github.com/tree-sitter/tree-sitter-typescript | master | tsx/src        |
-| typescript | https://github.com/tree-sitter/tree-sitter-typescript | master | typescript/src |
-| yaml       | https://github.com/ikatyang/tree-sitter-yaml          |        |                |
-
 * Miscellaneous
 #+begin_src elisp :tangle ~/.config/doom/packages.el
 (package! gnuplot-mode)
@@ -1325,7 +986,6 @@ https://www.overleaf.com/learn/latex/Using_colors_in_LaTeX
 (package! all-the-icons)
 (package! riscv-mode)
 (package! anki-editor)
-(package! wakatime-mode)
 (package! outshine
   :recipe (:host github :repo "alphapapa/outshine"))
 (package! sparql
@@ -1516,9 +1176,6 @@ https://www.overleaf.com/learn/latex/Using_colors_in_LaTeX
   :config (citar-org-roam-mode))
 #+end_src
 
-#+RESULTS:
-: t
-
 ** svelte-mode
 SGML mode, which svelte-mode is derived from, automatically closes your current tag for you with the C-c C-e shortcut (sgml-close-tag). This however does not work for components that share their name with unclosed html tags, like for example the Link component from svelte-routing. SGML mode by default checks whether tags are supposed to be closed or not by comparing tag names with lists of element names case-insensitively, so <Link> is equivalent to <link>. The following configuration snippet makes the comparison of tag names by SGML mode case-sensitive when svelte-mode is the current active major-mode in the buffer. Just add it to your config file and you're good to go. (explanation copied from [[https://github.com/leafOfTree/svelte-mode][its repo]])
 #+begin_src elisp
@@ -1551,18 +1208,6 @@ Interesting complement to dired
   :init
   ;; Let Dirvish take over Dired globally
   (dirvish-override-dired-mode))
-#+end_src
-** plantuml
-#+begin_src elisp
-;; (setq plantuml-jar-path "~/.plantuml/plantuml.jar")
-;; (setq plantuml-default-exec-mode 'jar)
-;; (setq org-plantuml-jar-path
-;;       (expand-file-name "/home/luis/.plantuml/plantuml.jar"))
-;; (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
-#+end_src
-** r
-#+begin_src elisp
-;(require 'ess-site)
 #+end_src
 ** cfwl
 #+begin_src
@@ -1644,15 +1289,6 @@ Interesting complement to dired
         (holiday-float 9 1 1 "Labor Day")
         (holiday-fixed 3 17 "St. Patrick's Day")
         ))
-;; USEFUL when I go to USA
-;; (holiday-fixed 1 1 "New Year's Day")
-;;  (holiday-fixed 2 2 "Groundhog Day")
-;;  (holiday-fixed 2 14 "Valentine's Day")
-;;  (holiday-float 2 1 3 "President's Day")
-;;  (holiday-float 5 0 2 "Mother's Day")
-;;  (holiday-float 6 0 3 "Father's Day")
-;;  (holiday-float 10 1 2 "Columbus Day")
-;;  (holiday-fixed 11 11 "Veteran's Day")
 #+end_src
 
 *** Local (Madrid + Spain)
@@ -1686,14 +1322,6 @@ Interesting complement to dired
                '("\\.py\\'" flymake-pylint-init)))
 #+end_src
 
-** Transparency
-#+begin_src elisp
-;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
-;;(set-frame-parameter (selected-frame) 'alpha <both>)
-;;(set-frame-parameter (selected-frame) 'alpha '(95 . 85))
-;;(add-to-list 'default-frame-alist '(alpha . (100 . 75)))
-;;(doom/set-frame-opacity 95)
-#+end_src
 ** bqn
 #+begin_src elisp
 (use-package! bqn-mode
@@ -1701,18 +1329,10 @@ Interesting complement to dired
               ("C-c C-c" . bqn-comint-eval-buffer)))
 #+end_src
 
-** wakatime
-#+begin_src elisp
-;(global-wakatime-mode)
-;(setq wakatime-api-key "waka_7c8efaf8-c924-417d-bb91-281692336d98")
-#+end_src
 ** yas
 #+begin_src elisp
 (add-to-list 'yas-snippet-dirs (concat doom-user-dir "snippets/"))
 #+end_src
-
-#+RESULTS:
-| /home/luis/.config/doom/snippets/ | +snippets-dir | doom-snippets-dir | +file-templates-dir |
 ** prettify-symbols
 #+begin_src elisp
 (defun org-icons ()
@@ -1723,9 +1343,6 @@ Interesting complement to dired
    (prettify-symbols-mode))
 (add-hook 'org-mode-hook 'org-icons)
 #+end_src
-
-#+RESULTS:
-| er/add-org-mode-expansions | org-icons | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | laas-mode | org-fragtog-mode | org-ref-org-menu | (closure ((hook . org-mode-hook)) (&rest _) (progn (let ((tail '(after-change-major-mode-hook))) (while tail (let ((hook (car tail))) (let ((tail (list #'(lambda (&rest _) (if (derived-mode-p 'org-mode) (progn (setq tab-width 8))))))) (while tail (let ((func (car tail))) (add-hook hook func nil t) (setq tail (cdr tail))))) (setq tail (cdr tail)))))) (add-hook 'save-place-after-find-file-hook #'+org-make-last-point-visible-h nil t)) | +lookup--init-org-mode-handlers-h | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | doom-disable-show-paren-mode-h | doom-disable-show-trailing-whitespace-h | evil-org-mode | org-eldoc-load | toc-org-enable | embrace-org-mode-hook |
 ** sparql-mode
 #+begin_src elisp
 (add-to-list 'auto-mode-alist '("\\.sparql$" . sparql-mode))

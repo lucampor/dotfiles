@@ -7,7 +7,6 @@
 (package! org-fragtog
   :recipe (:host github :repo "io12/org-fragtog"))
 (package! org-roam-bibtex)
-(package! org-chef)
 (package! org-download)
 (package! org-super-agenda)
 
@@ -35,7 +34,6 @@
 (package! all-the-icons)
 (package! riscv-mode)
 (package! anki-editor)
-(package! wakatime-mode)
 (package! outshine
   :recipe (:host github :repo "alphapapa/outshine"))
 (package! sparql

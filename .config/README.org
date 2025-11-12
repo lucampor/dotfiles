@@ -7,7 +7,7 @@ sudo pacman -S rofi dunst kitty alacritty ranger keepassxc neovim fastfetch ttf-
 #+end_src
 Some other applications that I use:
 #+begin_src zsh
-paru -S waterfox texlive-full unityhub jdownloader inkscape pywal-git krita 
+paru -S waterfox texlive-full unityhub jdownloader inkscape pywal-git krita zotero
 #+end_src
 
 Follow the steps in these install guides (kudos to all of them for being my starting point)

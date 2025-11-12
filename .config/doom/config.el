@@ -139,18 +139,6 @@ to if called with ARG, or any prefix argument."
   (org-journal-file-header "#+TITLE: %B %Y Monthly Journal\n#+STARTUP: folded\n")) ;'org-journal-file-header-func))
 (setq diary-file (concat org-journal-dir "dates.org"))
 
-;; (defun jethro/tag-new-node-as-draft ()
-;;   (org-roam-tag-add '("__draft__")))
-;; (add-hook 'org-roam-capture-new-node-hook #'jethro/tag-new-node-as-draft)
-
-;; (defmacro lcp/org-roam-template (letter name &optional class)
-;;   `(,letter ,name plain "%?" :target
-
-;;         (file+head ,(concat ,name "/${slug}.org" "#+title: ${title}\n" ,(if ,class (concat "#+latex_class: " ,class )) "\n#+startup: latexpreview"));#+filetags: :__draft__:\n")
-;;           :jump-to-capture t
-;;           :unnarrowed t))
-;; (lcp/org-roam-template "ca" "artificial intelligence" "compsci")
-
 (use-package! org-roam
   :ensure t
   :init
@@ -230,84 +218,6 @@ to if called with ARG, or any prefix argument."
     (file+head "${slug}.org" "#+title: ${title}\n#+startup: latexpreview\n");#+filetags: :__draft__:\n")
     :jump-to-capture t
     :unnarrowed t)
-    ;; ("m" "math" plain "%?" :target
-    ;; (file+head "math/${slug}.org" "#+title: ${title}\n#+latex_class: math\n#+startup: latexpreview");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("c" "compsci" plain "%?" :target
-    ;; (file+head "compsci/${slug}.org" "#+title: ${title}\n#+latex_class: compsci\n#+startup: latexpreview");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-
-    ;; ("e" "essay") ; "miscellaneous with purpose"
-    ;; ("ef" "fleeting" plain "%?" :target
-    ;; (file+head "essay/fleeting/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("ez" "zettelkasten" plain "%?" :target
-    ;; (file+head "essay/zettelkasten/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-
-    ;; ("t" "miscellaneous" plain "%?" :target ; "didn't want to call it trivia"
-    ;; (file+head "miscellaneous/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-
-    ;; ("s" "social science" plain "%?" :target
-    ;; (file+head "social science/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-
-    ;; ("i" "index and mind map" plain "%?" :target
-    ;;  (file+head "index/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;;  :jump-to-capture t
-    ;;  :unnarrowed t)
-
-    ;; ("h" "health" plain "%?" :target
-    ;;  (file+head "health/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;;  :jump-to-capture t
-    ;;  :unnarrowed t)
-
-    ;; ("a" "art")
-    ;; ("aa" "anime & manga" plain "%?" :target
-    ;; (file+head "art/anime/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("al" "literature" plain "%?" :target
-    ;; (file+head "art/literature/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("ap" "painting & fine arts" plain "%?" :target
-    ;; (file+head "art/fine arts/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("ac" "cinematography" plain "%?" :target
-    ;; (file+head "art/cinematography/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("am" "music" plain "%?" :target
-    ;; (file+head "art/music/${slug}.org" "#+title: ${title}\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-
-    ;; ("l" "language")
-    ;; ("lr" "русский" plain "%?" :target
-    ;; (file+head "language/russkii/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("lt" "türkçe" plain "%?" :target
-    ;; (file+head "language/türkçe/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("lf" "français" plain "%?" :target
-    ;; (file+head "language/français/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
-    ;; ("ld" "deutsch" plain "%?" :target
-    ;; (file+head "language/deutsch/${slug}.org" "#+title: ${title}\n");#+filetags: :__draft__:\n")
-    ;; :jump-to-capture t
-    ;; :unnarrowed t)
     ))
 
 (use-package! org-brain
@@ -319,11 +229,7 @@ to if called with ARG, or any prefix argument."
 (setq org-log-into-drawer 't)
 (setq org-todo-keywords
     '((sequence "TODO(t)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
-      (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v!)" "[X](x!)")
-      ;(sequence "HOMEWORK(h)" "EXAM(e)" "LAB(b)" "CHECK(k)" "MEETING(m)" "PLAN(p)" "IDEA(i)" "|") ;"TASK" "DELIVERY(d)" "MEETING(M)" "LANGUAGE(L)" "HEALTH(H)" "|" "FINISHED(F)")
-      ;(sequence "IDEA(i)" "MAYBE(y)" "SOMEDAY(m)" "PROJECT(r)" "GOAL(g)" "LEARN(l)" "|" "DONE" "DROPPED(P)") ; Stuck projects
-      ;(sequence "CHORE(R)" "PLAN(p)" "TRIP(T)" "EVENT(E)" "|" "DONE" "MISSED(S)"))
-      ))
+      (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v!)" "[X](x!)")))
 
 (setq org-todo-keyword-faces
     '(("TODO" . (:foreground "maroon" :weight bold)) ;
@@ -331,40 +237,14 @@ to if called with ARG, or any prefix argument."
       ("NEXT" . (:foreground "#EE7621" :weight bold))
       ("DONE" . (:foreground "#1E90FF" :weight bold))
       ("CANCELED" . (:foreground "#FF3030" :weight bold))
-
-      ;; ("DAILY" . (:foreground "#FF7F24" :weight bold))
-
-      ;; ("EXAM" . (:foreground "#EE7942" :weight bold))
-      ;; ("LAB" . (:foreground "thistle" :weight bold))
-      ;; ("TASK" . (:foreground "maroon" :weight bold))
-      ;; ("DELIVERY" . (:foreground "#FFF68F" :weight bold))
-      ;; ("LANGUAGE" . (:foreground "#98FB98" :weight bold))
-      ;; ("HEALTH" . (:foreground "#138414" :weight bold))
-      ;; ("MEETING" . (:foreground "#EED5D2" :weight bold))
-      ;; ("FINISHED" . (:foreground "#1E90FF" :weight bold))
-
-      ;; ("IDEA" . (:foreground "DeepSkyBlue1" :weight bold))
-      ;; ("MAYBE" . (:foreground "#610E5D" :weight bold))
-      ;; ("CHECK" . (:foreground "aquamarine" :weight bold))
-      ;; ("SOMEDAY" . (:foreground "#EED5D2" :weight bold))
-      ;; ("PROJECT" . (:foreground "#4EEE94" :weight bold))
-      ;; ("GOAL". (:foregoround "#FF3E96" :weight bold))
-      ;; ("LEARN" . (:foreground "#8EE5EE" :weight bold))
-      ;; ("DROPPED" . (:foreground "#FF3030" :weight bold))
-
-      ;; ("[ ]" . (:foreground "SteelBlue" :weight bold))
-      ;; ("[-]" . (:foreground "#EEC591" :weight bold))
-      ;; ("[#]" . (:foreground "#178595" :weight bold))
-      ;; ("[?]" . (:foreground "#FE8591" :weight bold))
-      ;; ("[!]" . (:foreground "#9E3511" :weight bold))
-      ;; ("[V]" . (:foreground "LimeGreen" :weight bold))
-      ;; ("[X]" . (:foreground "IndianRed" :weight bold))
-
-      ;; ("CHORE" . (:foreground "chocolate" :weight bold))
-      ;; ("PLAN" . (:foreground "deep pink" :weight bold))
-      ;; ("TRIP" . (:foreground "LightSteelBlue2" :weight bold))
-      ;; ("EVENT" . (:foreground "#B3EE3A" :weight bold))
-      ;; ("MISSED" . (:foreground "#FF3030" :weight bold))
+      
+      ("[ ]" . (:foreground "SteelBlue" :weight bold))
+      ("[-]" . (:foreground "#EEC591" :weight bold))
+      ("[#]" . (:foreground "#178595" :weight bold))
+      ("[?]" . (:foreground "#FE8591" :weight bold))
+      ("[!]" . (:foreground "#9E3511" :weight bold))
+      ("[V]" . (:foreground "LimeGreen" :weight bold))
+      ("[X]" . (:foreground "IndianRed" :weight bold))
       ))
 
 (setq org-priority-lowest 70)
@@ -380,33 +260,6 @@ to if called with ARG, or any prefix argument."
 (setq org-tags-exclude-from-inheritance '("main" "drill"
                                           "__book__" "__index__" "__subject__" "__media__" "__conference__" ;; Tags used in org-roam
                                           ))
-
-;; (setq org-tag-alist '(
-;;                       ;; Related to University
-;;                       ("#uni" . ?u)
-;;                       ("#eeuu" . ?u)
-;;                       (:startgrouptag)
-;;                       ("#neu" . ?n)
-;;                         (:grouptags)
-;;                         ("CS4830")("CS3700")("DS4400")("IS4300")
-;;                       (:endgrouptag)
-;;                       ;; Hobbies
-;;                       (:startgrouptag)
-;;                       ("#hobbie" . nil)
-;;                         (:grouptags)
-;;                         ("deutsch")("russkii");("chinese")
-;;                         (:grouptags)
-;;                         ("aeronu")("compsci")("gamedev")
-;;                         (:grouptags)
-;;                         ("transpirenaica")("archery");("flute")("chess")
-;;                       (:endgrouptag)
-;;                       ;; Tasks
-;;                       (:startgrouptag)
-;;                       ("#task" . nil)
-;;                         (:grouptags)
-;;                         ("buy")("clean")("cook")
-;;                       (:endgrouptag)
-;;                       ))
 
 (defvar lcp/org-projects-dir (concat org-directory "projects/"))
 
@@ -478,41 +331,6 @@ to if called with ARG, or any prefix argument."
 
 (defvar lcp--icons-dir (concat doom-user-dir "icons/"))
 
-(setq org-agenda-category-icon-alist
-      '(
-        ("addiction" "~/.config/doom/icons/gemini.svg" nil nil :ascent center :height 25);:mask heuristic)
-;-------------------------   HOBBIES   -------------------------;
-        ("hiking" "~/.config/doom/icons/hiking.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("mathematics" "~/.config/doom/icons/mathematics.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("gamedev" "~/.config/doom/icons/gamedev.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("book" "~/.config/doom/icons/book.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("running" "~/.config/doom/icons/running.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("flute" "~/.config/doom/icons/flute.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("sewing" "~/.config/doom/icons/sewing.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("cook" "~/.config/doom/icons/cook.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("culture" "~/.config/doom/icons/culture.svg" nil nil :ascent center :height 25);:mask heuristic)
-;-------------------------   LANGUAGES   -------------------------;
-        ("russkii" "~/.config/doom/icons/russkii.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("chinese" "~/.config/doom/icons/chinese.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("turkish" "~/.config/doom/icons/turkish.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ;("arab" nil nil :ascent center :height 25);:mask heuristic)
-        ;("suomi" nil nil :ascent center :height 25);:mask heuristic)
-;-------------------------  PROGRAMMING LANGUAGES   -------------------------;
-        ("haskell" "~/.config/doom/icons/haskell.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("rust" "~/.config/doom/icons/rust.svg" nil nil :ascent center :height 25);:mask heuristic)
-;-------------------------   CAREER   -------------------------;
-        ("EEUU" "~/.config/doom/icons/eeuu.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("vulcanus" "~/.config/doom/icons/japan.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ;("erasmus" nil nil :ascent center :height 25);:mask heuristic)
-        ("compsci" "~/.config/doom/icons/compsci.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("deutschland" "~/.config/doom/icons/deutschland.svg" nil nil :ascent center :height 25);:mask heuristic)
-;-------------------------   MISC   -------------------------;
-        ("university" "~/.config/doom/icons/university.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("health" "~/.config/doom/icons/health.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("chore" "~/.config/doom/icons/chore.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ("clean" "~/.config/doom/icons/clean.svg" nil nil :ascent center :height 25);:mask heuristic)
-        ))
-
 (defvar lcp/category-names
       (mapcar #'car org-agenda-category-icon-alist))
 
@@ -522,39 +340,7 @@ to if called with ARG, or any prefix argument."
   :header-form key);;(upcase key))
 
 (setq org-agenda-custom-commands
-      '(("p" "Proyectos"
-         ((agenda "STYLE=\"habit\""
-                  ((org-habit-show-all-today 't)
-                   (org-agenda-files (list lcp/org-projects-dir))
-                   (org-agenda-overriding-header "")
-                   (org-super-agenda-groups
-                    '((:name ""
-                       :auto-cat)
-                      (:discard (:tag "task"))))
-                   (org-agenda-sorting-strategy
-                    '(priority-down todo-state-up effort-up category-keep))))
-          (alltodo ""
-                     ((org-agenda-overriding-header "Things to do")
-                      (org-agenda-files (list lcp/org-projects-dir))
-                      (org-super-agenda-groups
-                       '((:name ""
-                          :auto-cat)
-                         (:discard (:tag "task"))
-                         ))))
-          (tags-todo "-STYLE=\"habit\"+task"
-                     ((org-agenda-overriding-header "Pending tasks"))))
-         ((org-agenda-span 1)
-          (org-use-tag-inheritance 'nil)
-          (org-agenda-dim-blocked-tasks nil)
-          (org-agenda-remove-tags 't)
-          (org-agenda-todo-ignore-timestamp 'nil)
-          (org-agenda-todo-keyword-format "")
-                      (org-agenda-use-time-grid 'nil)
-          (org-agenda-todo-ignore-scheduled 'nil)
-          (org-agenda-start-day "0d")
-          (org-agenda-show-inherited-tags 'nil)
-          (org-agenda-files (directory-files-recursively org-brain-path (rx ".org" eos)))))
-       ("n" "Journal"
+      '(("n" "Journal"
          (
           (agenda "" ((org-agenda-overriding-header "Previously...")
                       (org-agenda-start-day "-3d")
@@ -648,40 +434,6 @@ to if called with ARG, or any prefix argument."
                     :weight 'ultra-bold
                     :inverse-video 't
                     :slant 'reverse-italic)
-;(defvar lcp--tag-color-cons-alist)
-;; (defun lcp--org-agenda-tag-color ()
-
-;;   "This function changes the entry's foreground color depending on the tags depending of what is specified"
-;;   )
-;; (add-hook 'org-mode-hook
-;;           (lambda ()
-;;             (font-lock-add-keywords
-;;              'org-mode
-             ;; '(
-             ;;   ("^.*:#deutsch:.*$" 0 '(:foreground "#FF6347") t)
-             ;;   ("^.*:#eeuu:.*$" 0 '(:foreground "#5CACEE") t)
-             ;;   ("^.*:#uni:.*$" 0 '(:foreground "#FF82AB") t)
-             ;;   ("^.*:#health:.*$" 0 '(:foreground "#54FF9F") t)
-             ;;   ;("^.*:#hiking:.*$" 0 '(:foreground "#FF8247") t)
-             ;;   ("^.*:#compsci:.*$" 0 '(:foreground "#FF83FA") t)
-             ;;   ("^.*:#russki:.*$" 0 '(:foreground "#97FFFF") t)
-             ;;   ("^.*:#gamedev:.*$" 0 '(:foreground "#FFE4E1") t)
-             ;;   )
-;)))
-
-;#'lcp--org-agenda-tag-color)
-
-;; (setq org-tag-faces
-;; '(
-;;   ("#deutsch" . '(:foreground "#FF6347"))
-;;   ("#eeuu" . '(:foreground "#5CACEE"))
-;;   ("#uni" . '(:foreground "#FF82AB"))
-;;   ("#health" . '(:foreground "#54FF9F"))
-;;   ;("#hiking" . '(:foreground "#FF8247"))
-;;   ("#compsci" . '(:foreground "#FF83FA"))
-;;   ("#russki" . '(:foreground "#97FFFF"))
-;;   ("#gamedev" . '(:foreground "#FFE4E1"))
-;;   ))
 
 ;; NOTE STICKY AGENDAS MUST BE ENABLED
 (setq org-agenda-sticky 't)
@@ -767,11 +519,6 @@ to if called with ARG, or any prefix argument."
           "* TODO %? %^g\nDEADLINE: %T"
           :tree-type month
           :time-prompt t)))
-
-(use-package! org-chef)
-
-;; (defun lcp/org-chef-add-to-roam
-;;     )
 
 (use-package! org-fragtog
   :after org
@@ -1278,14 +1025,6 @@ closed or not, to not confuse elements with Svelte components."
   ;; Let Dirvish take over Dired globally
   (dirvish-override-dired-mode))
 
-;; (setq plantuml-jar-path "~/.plantuml/plantuml.jar")
-;; (setq plantuml-default-exec-mode 'jar)
-;; (setq org-plantuml-jar-path
-;;       (expand-file-name "/home/luis/.plantuml/plantuml.jar"))
-;; (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
-
-;(require 'ess-site)
-
 (setq holiday-general-holidays
       '((holiday-fixed 1 1 "New Year's Day")
         (holiday-fixed 2 14 "Valentine's Day")
@@ -1300,15 +1039,6 @@ closed or not, to not confuse elements with Svelte components."
         (holiday-float 9 1 1 "Labor Day")
         (holiday-fixed 3 17 "St. Patrick's Day")
         ))
-;; USEFUL when I go to USA
-;; (holiday-fixed 1 1 "New Year's Day")
-;;  (holiday-fixed 2 2 "Groundhog Day")
-;;  (holiday-fixed 2 14 "Valentine's Day")
-;;  (holiday-float 2 1 3 "President's Day")
-;;  (holiday-float 5 0 2 "Mother's Day")
-;;  (holiday-float 6 0 3 "Father's Day")
-;;  (holiday-float 10 1 2 "Columbus Day")
-;;  (holiday-fixed 11 11 "Veteran's Day")
 
 (setq holiday-other-holidays
       '((holiday-fixed 5 1 "Día del Trabajo")
@@ -1336,18 +1066,9 @@ closed or not, to not confuse elements with Svelte components."
   (add-to-list 'flymake-allowed-file-name-masks
                '("\\.py\\'" flymake-pylint-init)))
 
-;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
-;;(set-frame-parameter (selected-frame) 'alpha <both>)
-;;(set-frame-parameter (selected-frame) 'alpha '(95 . 85))
-;;(add-to-list 'default-frame-alist '(alpha . (100 . 75)))
-;;(doom/set-frame-opacity 95)
-
 (use-package! bqn-mode
   :bind (:map bqn-mode-map
               ("C-c C-c" . bqn-comint-eval-buffer)))
-
-;(global-wakatime-mode)
-;(setq wakatime-api-key "waka_7c8efaf8-c924-417d-bb91-281692336d98")
 
 (add-to-list 'yas-snippet-dirs (concat doom-user-dir "snippets/"))
 
