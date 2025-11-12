@@ -1,0 +1,25 @@
+* Overview
+[[./screenshots/dotfile-main.png]]
+* Dependencies
+Run this to get the main dependencies
+#+begin_src zsh
+sudo pacman -S rofi dunst kitty alacritty ranger keepassxc neovim fastfetch ttf-cascadia-code-nerd ttf-nerd-fonts-symbols-common
+#+end_src
+Some other applications that I use:
+#+begin_src zsh
+paru -S waterfox texlive-full unityhub jdownloader inkscape pywal-git krita 
+#+end_src
+
+Follow the steps in these install guides (kudos to all of them for being my starting point)
+- [[https://github.com/doomemacs/doomemacs][Doom Emacs]]
+- [[https://starship.rs/][Starship]]
+- [[https://github.com/ohmyzsh/ohmyzsh][oh-my-zsh]]
+- [[https://github.com/nvim-lua/kickstart.nvim][kickstart-nvim]]
+- [[https://github.com/Darkkal44/Cozytile][Cozytile]]
+
+In case you also have ROG Zephyrus:
+- [[https://asus-linux.org/guides/arch-guide/][Asus-Linux]]
+
+Other interesting additions:
+- [[https://aur.chaotic.cx/docs][Chaotic AUR]]
+- [[https://github.com/AbijithBalaji/sekiro_grub_theme][Sekiro Grub Theme]]
