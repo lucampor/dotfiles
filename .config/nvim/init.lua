@@ -43,7 +43,7 @@ What is Kickstart?
 
 Kickstart Guide:
 
-  TODO: The very first thing you should do is to run the command `:Tutor` in Neovim.
+  DONE: The very first thing you should do is to run the command `:Tutor` in Neovim.
 
     If you don't know what this means, type the following:
       - <escape key>
@@ -97,6 +97,10 @@ vim.g.have_nerd_font = false
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
+
+-- XXX Don't forget this may lead to problems with some plugins.
+-- TODO Should any problem arise, don't forget to check whether this is the culprit
+vim.opt.autochdir = true
 
 -- Make line numbers default
 vim.o.number = true
@@ -406,15 +410,38 @@ require('lazy').setup({
 
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
+      local actions = require 'telescope.actions'
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          mappings = {
+            n = {
+                ["<M-k>"] = actions.preview_scrolling_up,
+                ["<M-j>"] = actions.preview_scrolling_down,
+                ["<M-h>"] = actions.preview_scrolling_left,
+                ["<M-l>"] = actions.preview_scrolling_right,
+
+                ["<C-k>"] = actions.move_selection_previous,
+                ["<C-j>"] = actions.move_selection_next,
+                ["<Left>"] = actions.results_scrolling_left,
+                ["<Right>"] = actions.results_scrolling_right,
+            },
+
+            i = {
+                ["<M-k>"] = actions.preview_scrolling_up,
+                ["<M-j>"] = actions.preview_scrolling_down,
+                ["<M-h>"] = actions.preview_scrolling_left,
+                ["<M-l>"] = actions.preview_scrolling_right,
+
+                ["<C-k>"] = actions.move_selection_previous,
+                ["<C-j>"] = actions.move_selection_next,
+                ["<C-Left>"] = actions.results_scrolling_left,
+                ["<C-Right>"] = actions.results_scrolling_right,
+            }
+          },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {

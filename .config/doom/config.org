@@ -296,7 +296,7 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
 (setq org-ellipsis " ⮷") ; ⚻ ☡ ⚕ ♅ ⚶
 (setq org-log-into-drawer 't)
 (setq org-todo-keywords
-    '((sequence "TODO(t)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
+    '((sequence "TODO(t)" "NEXT(n)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
       (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v!)" "[X](x!)")))
 
 (setq org-todo-keyword-faces
@@ -1348,4 +1348,3 @@ Interesting complement to dired
 (add-to-list 'auto-mode-alist '("\\.sparql$" . sparql-mode))
 (add-to-list 'auto-mode-alist '("\\.rq$" . sparql-mode))
 #+end_src
-* DnD

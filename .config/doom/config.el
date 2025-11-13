@@ -228,7 +228,7 @@ to if called with ARG, or any prefix argument."
 (setq org-ellipsis " ⮷") ; ⚻ ☡ ⚕ ♅ ⚶
 (setq org-log-into-drawer 't)
 (setq org-todo-keywords
-    '((sequence "TODO(t)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
+    '((sequence "TODO(t)" "NEXT(n)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
       (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v!)" "[X](x!)")))
 
 (setq org-todo-keyword-faces
