@@ -40,7 +40,8 @@
       (:prefix-map ("j" . "miscellaneous")
         :desc "Citar open" "c" #'citar-open
         :desc "Cloze region" "z" #'anki-editor-cloze-region
-        :desc "Switch input ru-es" "i" #'lcp/switch-input
+        :desc "Add note" "l" #'org-add-note
+        ;:desc "Switch input ru-es" "i" #'lcp/switch-input
         :desc "Multiple agenda view" "a" #'lcp/org-agenda-multiple-views
         :desc "Kill Ring" "y" #'yank-from-kill-ring
         :desc "Narrow" "n" #'org-toggle-narrow-to-subtree
@@ -228,13 +229,15 @@ to if called with ARG, or any prefix argument."
 (setq org-ellipsis " ⮷") ; ⚻ ☡ ⚕ ♅ ⚶
 (setq org-log-into-drawer 't)
 (setq org-todo-keywords
-    '((sequence "TODO(t)" "NEXT(n)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
+    '((sequence "TODO(t)" "NEXT(n)" "5MIN(m)" "IDEA(i)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
       (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v!)" "[X](x!)")))
 
 (setq org-todo-keyword-faces
     '(("TODO" . (:foreground "maroon" :weight bold)) ;
       ("WAIT" . (:foreground "#FDFF1F" :weight bold))
       ("NEXT" . (:foreground "#EE7621" :weight bold))
+      ("5MIN" . (:foreground "#7A67EE" :weight bold))
+      ("IDEA" . (:foreground "#EEAD0E" :weight bold))
       ("DONE" . (:foreground "#1E90FF" :weight bold))
       ("CANCELED" . (:foreground "#FF3030" :weight bold))
       
@@ -1082,3 +1085,5 @@ closed or not, to not confuse elements with Svelte components."
 
 (add-to-list 'auto-mode-alist '("\\.sparql$" . sparql-mode))
 (add-to-list 'auto-mode-alist '("\\.rq$" . sparql-mode))
+
+

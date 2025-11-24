@@ -18,6 +18,7 @@
 (package! lsp-haskell)
 (package! lsp-dart)
 
+(package! tidal)
 (package! gnuplot-mode)
 (package! bqn-mode)
 (package! load-theme-buffer-local)

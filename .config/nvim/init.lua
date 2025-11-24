@@ -418,28 +418,28 @@ require('lazy').setup({
         defaults = {
           mappings = {
             n = {
-                ["<M-k>"] = actions.preview_scrolling_up,
-                ["<M-j>"] = actions.preview_scrolling_down,
-                ["<M-h>"] = actions.preview_scrolling_left,
-                ["<M-l>"] = actions.preview_scrolling_right,
+              ['<M-k>'] = actions.preview_scrolling_up,
+              ['<M-j>'] = actions.preview_scrolling_down,
+              ['<M-h>'] = actions.preview_scrolling_left,
+              ['<M-l>'] = actions.preview_scrolling_right,
 
-                ["<C-k>"] = actions.move_selection_previous,
-                ["<C-j>"] = actions.move_selection_next,
-                ["<Left>"] = actions.results_scrolling_left,
-                ["<Right>"] = actions.results_scrolling_right,
+              ['<C-k>'] = actions.move_selection_previous,
+              ['<C-j>'] = actions.move_selection_next,
+              ['<Left>'] = actions.results_scrolling_left,
+              ['<Right>'] = actions.results_scrolling_right,
             },
 
             i = {
-                ["<M-k>"] = actions.preview_scrolling_up,
-                ["<M-j>"] = actions.preview_scrolling_down,
-                ["<M-h>"] = actions.preview_scrolling_left,
-                ["<M-l>"] = actions.preview_scrolling_right,
+              ['<M-k>'] = actions.preview_scrolling_up,
+              ['<M-j>'] = actions.preview_scrolling_down,
+              ['<M-h>'] = actions.preview_scrolling_left,
+              ['<M-l>'] = actions.preview_scrolling_right,
 
-                ["<C-k>"] = actions.move_selection_previous,
-                ["<C-j>"] = actions.move_selection_next,
-                ["<C-Left>"] = actions.results_scrolling_left,
-                ["<C-Right>"] = actions.results_scrolling_right,
-            }
+              ['<C-k>'] = actions.move_selection_previous,
+              ['<C-j>'] = actions.move_selection_next,
+              ['<C-Left>'] = actions.results_scrolling_left,
+              ['<C-Right>'] = actions.results_scrolling_right,
+            },
           },
         },
         -- pickers = {}

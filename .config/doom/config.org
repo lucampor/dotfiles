@@ -2,7 +2,7 @@
 :header-args: :tangle ~/.config/doom/config.el :results none
 :END:
 #+title: Literate Config
-#+startup: fold
+#+startup: show2levels
 * Basic things
 #+begin_src elisp
 (setq user-full-name "Luis Camacho"
@@ -33,7 +33,6 @@ No element cache. Otherwise instant crash when parsing latex
 
 (setq display-line-numbers-type 'visual)
 #+end_src
-
 ** Global functions
 #begin_src elisp
 (global-tree-sitter-mode)
@@ -63,7 +62,8 @@ No element cache. Otherwise instant crash when parsing latex
       (:prefix-map ("j" . "miscellaneous")
         :desc "Citar open" "c" #'citar-open
         :desc "Cloze region" "z" #'anki-editor-cloze-region
-        :desc "Switch input ru-es" "i" #'lcp/switch-input
+        :desc "Add note" "l" #'org-add-note
+        ;:desc "Switch input ru-es" "i" #'lcp/switch-input
         :desc "Multiple agenda view" "a" #'lcp/org-agenda-multiple-views
         :desc "Kill Ring" "y" #'yank-from-kill-ring
         :desc "Narrow" "n" #'org-toggle-narrow-to-subtree
@@ -296,13 +296,15 @@ This snippet ([[https://gist.github.com/chayward1/c02116caf5251c5debd398268c5e17
 (setq org-ellipsis " ⮷") ; ⚻ ☡ ⚕ ♅ ⚶
 (setq org-log-into-drawer 't)
 (setq org-todo-keywords
-    '((sequence "TODO(t)" "NEXT(n)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
+    '((sequence "TODO(t)" "NEXT(n)" "5MIN(m)" "IDEA(i)" "|" "WAIT(w@/!)" "DONE(o!)" "CANCELED(c@)")
       (sequence "[ ]" "[-]" "[#]" "[?]" "[!]" "|" "[V](v!)" "[X](x!)")))
 
 (setq org-todo-keyword-faces
     '(("TODO" . (:foreground "maroon" :weight bold)) ;
       ("WAIT" . (:foreground "#FDFF1F" :weight bold))
       ("NEXT" . (:foreground "#EE7621" :weight bold))
+      ("5MIN" . (:foreground "#7A67EE" :weight bold))
+      ("IDEA" . (:foreground "#EEAD0E" :weight bold))
       ("DONE" . (:foreground "#1E90FF" :weight bold))
       ("CANCELED" . (:foreground "#FF3030" :weight bold))
       
@@ -970,6 +972,7 @@ https://www.overleaf.com/learn/latex/Using_colors_in_LaTeX
 
 * Miscellaneous
 #+begin_src elisp :tangle ~/.config/doom/packages.el
+(package! tidal)
 (package! gnuplot-mode)
 (package! bqn-mode)
 (package! load-theme-buffer-local)
@@ -1347,4 +1350,7 @@ Interesting complement to dired
 #+begin_src elisp
 (add-to-list 'auto-mode-alist '("\\.sparql$" . sparql-mode))
 (add-to-list 'auto-mode-alist '("\\.rq$" . sparql-mode))
+#+end_src
+** tidal
+#+begin_src elisp
 #+end_src

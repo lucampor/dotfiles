@@ -4,8 +4,10 @@
 # Paths
 export ZSH=~/.oh-my-zsh/
 #export TERM=xterm-kitty
+export BROWSER=waterfox
 export EDITOR=nvim
 export XDG_CONFIG_HOME=~/.config
+export FABADA_RECIPES_DIR=~/Projekte/fabada/examples
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -142,6 +144,8 @@ alias gp='git push origin master'
 alias emcl='emacsclient --alternate-editor="" --no-wait $*'
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME $*'
 
+alias py_pr='$HOME/Dokumente/Heuristica/pr2/bin/python $*'
+alias py_pip='$HOME/Dokumente/Heuristica/pr2/bin/pip $*'
 
 #custom stuff
 cat ~/.cache/wal/sequences
@@ -150,3 +154,6 @@ eval "$(starship init zsh)"
 
 export BUN_INSTALL="$HOME/.bun" 
 export PATH="$BUN_INSTALL/bin:$PATH" 
+export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
+
+[ -f "/home/myskat/.ghcup/env" ] && . "/home/myskat/.ghcup/env" # ghcup-env
