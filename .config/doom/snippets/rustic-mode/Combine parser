@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Combine parser
+# key: <cp
+# --
+
+fn ${1:name}<Input>() -> impl Parser<Input${2:, Output=$3}>
+where Input: Stream<Token = char>
+{$0}

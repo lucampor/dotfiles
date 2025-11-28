@@ -9,13 +9,15 @@
 (defwidget project-list []
     (box :orientation "v"
         (project :name "SCHEDULE"
-                 :script "libreoffice -o ${get_env("HOME")}/Dokumente/Wöchentlicher_Zeitplan.ods")
+                 :script "libreoffice -o ${get_env("HOME")}/Dokumente/wöchentlicher-zeitplan.ods")
         (project :name "godot")
         (project :name "vulcanus")
+        (project :name "tidalcycles")
+        (project :name "russkii")
         (project :name "pixelart")
         (project :name "ableton")
-        (project :name "russkii")
         (project :name "tfg")
+        (project :name "genart")
         (project :name "fadaba")
         (project :name "gaycon")
         (project :name "dnd")
@@ -28,7 +30,7 @@
            :geometry (geometry :x "-1%"
                                :y "0%"
                                :width "5%"
-                               :height "60%"
+                               :height "85%"
                                :anchor "center right")
            :stacking "overlay"
            :windowtype "normal"
